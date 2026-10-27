@@ -19,18 +19,28 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        // اگر رابطه‌ها در مدل User تعریف نشده باشند، خطا نمی‌دهد
         $hasPosts = method_exists($user, 'posts');
-        $hasComments = method_exists($user, 'comments');
-
         $posts = $hasPosts ? $user->posts()->latest()->take(5)->get() : collect();
+
+        // شمارش کامنت‌ها بر اساس وضعیت: ['approved' => 3, 'pending' => 1]
+        $commentCounts = $user->comments()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        // کامنت‌های خود کاربر، صفحه‌بندی‌شده (۵ تا در هر صفحه) با پست مربوطه
+        $comments = $user->comments()
+            ->with('post:id,title')
+            ->latest()
+            ->paginate(5, ['*'], 'comments_page')
+            ->fragment('my-comments');
 
         $stats = [
             'posts'    => $hasPosts ? $user->posts()->count() : 0,
-            'comments' => $hasComments ? $user->comments()->where('status','approved')->count() : 0,
+            'comments' => $commentCounts['approved'] ?? 0,
         ];
 
-        return view('dashboard', compact('user', 'posts', 'stats'));
+        return view('dashboard', compact('user', 'posts', 'stats', 'comments', 'commentCounts'));
     }
 
     // تغییر نام و ایمیل

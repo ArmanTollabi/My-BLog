@@ -40,6 +40,21 @@
                        class="glass-input text-left @error('email') !border-rose-400/70 @enderror">
             </div>
 
+            <!-- User role -->
+            <div class="mb-6">
+                <label for="role" class="block text-sm font-semibold text-white mb-2">
+                    User role:
+                </label>
+                <select id="role" name="role" required
+                        class="glass-input @error('role') !border-rose-400/70 @enderror">
+                    <option value="subscriber" @selected(old('role', 'subscriber') === 'subscriber')>Subscriber</option>
+                    <option value="admin" @selected(old('role') === 'admin')>Admin</option>
+                </select>
+                @error('role')
+                <p class="text-rose-300 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
             <!-- Avatar -->
             <div class="mb-6">
                 <label class="block text-sm font-bold text-white mb-2">آواتار</label>

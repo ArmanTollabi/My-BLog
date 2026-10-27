@@ -13,32 +13,32 @@ use Illuminate\Support\Facades\Password;
 class UserController extends Controller
 {
     public function index(User $user,request $request){
-       $this->authorize('access_user', $user);
+        $this->authorize('access_user', $user);
 
         $users = User::withCount('posts')->when($request->search,function ($query,$search){
             $query->where(function ($query) use ($search){
                 $query->where('name','like','%'.$search.'%')
-                ->orWhere('email','like','%'.$search.'%');
+                    ->orWhere('email','like','%'.$search.'%');
             });
         })
-        ->when($request->post_filter === 'most',function ($query){
-            $query->orderByDesc('posts_count');
-        })
-        ->when($request->post_filter === 'least',function ($query){
-            $query->orderBy('posts_count');
-        })
-        ->when($request->post_filter === 'over_5',function ($query){
-            $query->has('posts','>',5);
-        })
-        ->when($request->post_filter === 'over_10',function ($query){
-            $query->has('posts','>',10);
-        })
-        ->when($request->post_filter === 'over_20',function ($query){
-            $query->has('posts','>',20);
-        })
-        ->oldest()
-        ->paginate(4)
-        ->withQueryString();
+            ->when($request->post_filter === 'most',function ($query){
+                $query->orderByDesc('posts_count');
+            })
+            ->when($request->post_filter === 'least',function ($query){
+                $query->orderBy('posts_count');
+            })
+            ->when($request->post_filter === 'over_5',function ($query){
+                $query->has('posts','>',5);
+            })
+            ->when($request->post_filter === 'over_10',function ($query){
+                $query->has('posts','>',10);
+            })
+            ->when($request->post_filter === 'over_20',function ($query){
+                $query->has('posts','>',20);
+            })
+            ->oldest()
+            ->paginate(4)
+            ->withQueryString();
         return view('users.index', compact('users'));
 
     }
@@ -59,10 +59,11 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'role' => ['required', Rule::in(['admin', 'subscriber'])],
             'avatar_path' => ['nullable','string']
         ]);
 
-            $validated['avatar'] = $validated['avatar_path'] ?? null;
+        $validated['avatar'] = $validated['avatar_path'] ?? null;
 
 
         unset($validated['avatar_path']);
@@ -93,6 +94,13 @@ class UserController extends Controller
 
         unset($validatedData['avatar_path']);
 
+        // تغییر نقش: فقط ادمین، و نه روی حساب خودش (جلوگیری از قفل شدن پنل و ارتقای نقش توسط کاربر عادی)
+        if ($request->user()->role === 'admin' && ! $user->is($request->user())) {
+            $validatedData['role'] = $request->validate([
+                'role' => ['required', Rule::in(['admin', 'subscriber'])],
+            ])['role'];
+        }
+
         if($request->filled('current_password') || $request->filled('new_password')){
             $request->validate([
                 'current_password' => ['required', 'string', 'min:6'],
@@ -100,7 +108,7 @@ class UserController extends Controller
             ]);
 
             if(! Hash::check( $request->current_password , $user->password)){
-               // dd('current pass :'.Hash::$request->current_password .'  '.'db pass :'.$user->password);
+                // dd('current pass :'.Hash::$request->current_password .'  '.'db pass :'.$user->password);
                 return back()->withErrors([
                     'current_passwrod' => 'Your current password does not matches with the password you provided. Please try again.'
                 ])->withInput();

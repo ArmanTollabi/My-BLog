@@ -58,6 +58,17 @@
                 </div>
 
                 <div>
+                    <dt class="block text-sm font-semibold text-white/70 mb-2">User role</dt>
+                    <dd>
+                        {{-- فقط نمایشی (disabled)؛ تغییر نقش از صفحه‌ی ویرایش انجام می‌شود --}}
+                        <select disabled class="glass-input cursor-default opacity-100" aria-label="User role">
+                            <option value="admin" @selected($user->role === 'admin')>Admin</option>
+                            <option value="subscriber" @selected($user->role !== 'admin')>Subscriber</option>
+                        </select>
+                    </dd>
+                </div>
+
+                <div>
                     <dt class="block text-sm font-semibold text-white/70 mb-2">Profile photo</dt>
                     <dd class="glass-input cursor-default break-all">
                         @if($user->avatar)

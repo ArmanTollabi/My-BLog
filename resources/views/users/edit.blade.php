@@ -41,6 +41,27 @@
                        class="glass-input text-left @error('email') !border-rose-400/70 @enderror">
             </div>
 
+            {{-- User role: فقط ادمین می‌بیند؛ روی حساب خودِ ادمین غیرفعال است --}}
+            @if(auth()->user()->role === 'admin')
+                @php($isSelf = auth()->id() === $user->id)
+                <div class="mb-6">
+                    <label for="role" class="block text-sm font-semibold text-white mb-2">
+                        User role:
+                    </label>
+                    <select id="role" name="role" @disabled($isSelf)
+                    class="glass-input @error('role') !border-rose-400/70 @enderror">
+                        <option value="admin" @selected(old('role', $user->role) === 'admin')>Admin</option>
+                        <option value="subscriber" @selected(old('role', $user->role) !== 'admin')>Subscriber</option>
+                    </select>
+                    @if($isSelf)
+                        <p class="text-white/50 text-xs mt-1">نقش حساب خودت را نمی‌توانی تغییر بدهی.</p>
+                    @endif
+                    @error('role')
+                    <p class="text-rose-300 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            @endif
+
             {{-- Current / New Image --}}
             <div class="mb-8">
 
