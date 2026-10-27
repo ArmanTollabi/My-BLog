@@ -27,7 +27,7 @@ class DashboardController extends Controller
 
         $stats = [
             'posts'    => $hasPosts ? $user->posts()->count() : 0,
-            'comments' => $hasComments ? $user->comments()->count() : 0,
+            'comments' => $hasComments ? $user->comments()->where('status','approved')->count() : 0,
         ];
 
         return view('dashboard', compact('user', 'posts', 'stats'));
