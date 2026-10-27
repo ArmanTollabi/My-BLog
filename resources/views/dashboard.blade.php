@@ -214,7 +214,7 @@
                         <h2 class="text-xl font-bold text-white">آخرین کامنتهای من</h2>
                     </div>
 
-                    @forelse($user->comments as $comment)
+                    @forelse($user->comments()->latest()->get() as $comment)
                         <a href="{{ route('posts.show', $comment->id) }}"
                            class="flex items-center justify-between gap-3 rounded-2xl border border-transparent px-4 py-3
                                   transition hover:border-white/15 hover:bg-white/10">
