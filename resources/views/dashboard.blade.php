@@ -214,12 +214,18 @@
                         <h2 class="text-xl font-bold text-white">آخرین کامنتهای من</h2>
                     </div>
 
-                    @forelse($post->comments as $comments)
-                        <a href="{{ route('posts.show', $comments->post->id) }}"
+                    @forelse($user->comments as $comment)
+                        <a href="{{ route('posts.show', $comment->id) }}"
                            class="flex items-center justify-between gap-3 rounded-2xl border border-transparent px-4 py-3
                                   transition hover:border-white/15 hover:bg-white/10">
-                            <span class="truncate font-semibold text-white">{{ $comments->post->title }}</span>
-                            <span class="shrink-0 text-xs text-white/50">{{ $comments->created_at->format('Y/m/d H:i') }}</span>
+                            <span class="truncate font-semibold text-white">{{$comment->body}}</span>
+                            <span class="truncate font-semibold text-white hover:">  در {{ $comment->post->title }}</span>
+                            @if($comment->status =='approved')
+                            <span class="shrink-0 text-xs text-white/50">{{ $comment->created_at->format('Y/m/d H:i') }}</span>
+                            @endif
+                            @if($comment->status == 'pending')
+                                <span class="shrink-0 text-xs text-white/50">منتظر تایید کامنت توسط ادمین باشید</span>
+                            @endif
                         </a>
                     @empty
                         <p class="py-6 text-center text-white/55">هنوز کامنتی نگذاشته اید.</p>
