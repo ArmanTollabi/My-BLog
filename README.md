@@ -15,6 +15,7 @@ A Laravel-based blog application built with PHP, Laravel, and MySQL.
 - **Image Uploads:** Upload post images and user avatars.
 - **Search and Pagination:** Find content and navigate through paginated results.
 - **Authorization:** Policies and middleware for access control.
+- **Liking Posts System** : Like your favorite posts!
 
 ## Tech Stack
 
@@ -167,6 +168,7 @@ No project-specific license has been declared yet.
 - **آپلود تصاویر:** امکان بارگذاری تصویر برای مطالب و آواتار کاربران.
 - **جست‌وجو و صفحه‌بندی:** جست‌وجوی محتوا و نمایش نتایج در صفحات جداگانه.
 - **کنترل دسترسی:** استفاده از Policyها و Middleware برای مدیریت مجوزهای کاربران.
+- **سیستم لایک پست** : لایک کردن پست ها در صورت دوست داشتن!
 
 ## فناوری‌های استفاده‌شده
 
