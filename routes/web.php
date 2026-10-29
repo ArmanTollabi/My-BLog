@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\AdminCommentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminPostController;
 use App\Http\Middleware\EnsureAdmin;
+use App\Http\Controllers\PostLikeController;
 use function Pest\Laravel\put;
 
 Route::get('/', [PostController::class, 'home'])->name('home');
@@ -35,6 +36,10 @@ Route::resource('posts', PostController::class)->only(['index', 'show']);
 Route::middleware('auth')->group(function () { //users & posts auth
     Route::resource('posts', PostController::class)->except(['index', 'show']);
     Route::resource('users', UserController::class);
+    //post likes
+    Route::post('/posts/{post}/like', [PostLikeController::class, 'toggle'])
+        ->middleware(['auth', 'throttle:60,1'])
+        ->name('posts.like');
     //notifs
     Route::get('/notifications/{notification}', [NotificationController::class, 'read'])->name('notifications.read');
 });

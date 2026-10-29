@@ -84,4 +84,19 @@ class Post extends Model
             ->map(fn ($line) => '<p dir="auto">' . e($line) . '</p>')
             ->implode('');
     }
+
+
+
+    /** کاربرانی که این پست را لایک کرده‌اند */
+    public function likes(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'post_likes')->withTimestamps();
+    }
+
+    /** آیا این کاربر پست را لایک کرده؟ (مهمان = false) */
+    public function isLikedBy(?User $user): bool
+    {
+        return $user !== null && $this->likes()->where('users.id', $user->id)->exists();
+    }
+
 }

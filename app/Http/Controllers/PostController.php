@@ -21,7 +21,7 @@ class PostController extends Controller
 {
 
     public function apiIndex(Request $request){
-        $per_page = min($request->integer('per_page', 3), 7);
+        $per_page = min($request->integer('per_page', 6), 7);
         $posts = Post::with('user','tags','category')
             ->when($request->search,fn($query)   => $query->search($request->search))
             ->when($request->category,fn($query) => $query->category($request->category))
@@ -85,7 +85,7 @@ class PostController extends Controller
         $tags = Tag::latest()->get();
         $categories = Category::latest()->get();
 
-        $posts = Post::with(['user', 'category', 'tags'])->when($request->search, function ($query, $search) {
+        $posts = Post::with(['user', 'category', 'tags'])->withCount('likes')->when($request->search, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('title', 'like', '%' . $search . '%')
                     ->orWhere('description', 'like', '%' . $search . '%');
@@ -115,7 +115,14 @@ class PostController extends Controller
     }
 
     public function show(Post $post){
-        $post->load('user','category','tags');
+        $post->load('user','category','tags')->loadCount('likes');
+        $liked = $post->isLikedBy(auth()->user());
+
+        // مهمان بعد از ورود/ثبت‌نام (از پاپ‌آپ لایک) به همین پست برگردد
+        if (auth()->guest()) {
+            session()->put('url.intended', url()->current());
+        }
+
         $comments = $post->comments()
             ->whereNull('parent_id')
             ->with([
@@ -124,7 +131,7 @@ class PostController extends Controller
             ])
             ->latest()
             ->paginate(6);
-        return view('posts.show', compact('post', 'comments'));
+        return view('posts.show', compact('post', 'comments', 'liked'));
     }
 
     public function create(){

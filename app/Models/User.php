@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -36,6 +37,11 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function likedPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(Post::class, 'post_likes')->withTimestamps();
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -48,4 +54,5 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
 }
