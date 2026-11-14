@@ -17,9 +17,9 @@ class AdminDashboardController extends Controller
         // را در حافظه می‌سازیم (مستقل از نوع دیتابیس و بدون کش).
         $from = now()->startOfMonth()->subMonths(11);
 
-        $users    = User::where('created_at', '>=', $from)->get(['created_at'])->pluck('created_at');
-        $posts    = Post::where('created_at', '>=', $from)->get(['created_at'])->pluck('created_at');
-        $comments = Comment::where('created_at', '>=', $from)->get(['created_at'])->pluck('created_at');
+        $users    = User::where('created_at', '>=', $from)->pluck('created_at');
+        $posts    = Post::where('created_at', '>=', $from)->pluck('created_at');
+        $comments = Comment::where('created_at', '>=', $from)->pluck('created_at');
 
         $totalUsers = User::count();
 
@@ -42,7 +42,7 @@ class AdminDashboardController extends Controller
             'chart'           => $chart,
             'categories'      => $this->categoryDistribution(),
             'latestUsers'     => User::latest()->take(5)->get(),
-            'pendingComments' => Comment::pending()->with(['user', 'post'])->latest()->take(5)->get(),
+            'pendingComments' => Comment::pending()->with(['user', 'post:id,title,slug'])->latest()->take(5)->get(),
         ]);
     }
 

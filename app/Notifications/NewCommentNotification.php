@@ -32,8 +32,8 @@ class NewCommentNotification extends Notification
 
     public function toDatabase(object $notifiable): array{
         return [
-            'message' => $this->comment->user->name.' has commented on your post',
-            'post_id' => $this->comment->post_id,
+            'message' => $this->comment->user->name.' برات کامنت گذاشته',
+            'post_id' => $this->comment->post->slug,
             'comment_id' => $this->comment->id
         ];
     }

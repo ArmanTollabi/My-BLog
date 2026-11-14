@@ -6,7 +6,12 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js','resources/js/custom.js'],
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.js',
+                'resources/js/admin-dashboard.js',   // فقط داشبورد ادمین (Chart.js)
+                'resources/js/post-form.js',         // فقط فرم پست (Quill)
+            ],
             refresh: true,
             fonts: [
                 bunny('Instrument Sans', {

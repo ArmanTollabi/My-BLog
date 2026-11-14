@@ -4,20 +4,21 @@
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
 
             <p class="text-sm">
-                © 2026 MyBlog. All rights reserved.
+                © {{ \Morilog\Jalali\CalendarUtils::convertNumbers(\Morilog\Jalali\Jalalian::now()->getYear()) }}
+                وبلاگ من. تمامی حقوق محفوظ است.
             </p>
 
             <div class="flex items-center gap-6 text-sm">
                 <a href="#" class="hover:text-white transition">
-                    Privacy
+                    حریم خصوصی
                 </a>
 
                 <a href="#" class="hover:text-white transition">
-                    Terms
+                    قوانین و مقررات
                 </a>
 
                 <a href="#" class="hover:text-white transition">
-                    Contact
+                    تماس با ما
                 </a>
             </div>
 

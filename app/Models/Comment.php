@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\CommentStatus;
+use App\Traits\HasJalaliDates;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,9 +13,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Comment extends Model
 {
     use SoftDeletes;
+    use HasJalaliDates;
 
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_APPROVED = 'approved';
+    // سازگاری با کدهای قدیمی (Comment::STATUS_PENDING)؛ منبع اصلی حالا Enum است
+    public const STATUS_PENDING = CommentStatus::Pending->value;
+    public const STATUS_APPROVED = CommentStatus::Approved->value;
 
     protected $fillable = [
         'user_id',
@@ -45,17 +49,17 @@ class Comment extends Model
 
     public function isApproved(): bool
     {
-        return $this->status === self::STATUS_APPROVED;
+        return $this->status === CommentStatus::Approved->value;
     }
 
     public function scopeApproved(Builder $query): Builder
     {
-        return $query->where($this->qualifyColumn('status'), self::STATUS_APPROVED);
+        return $query->where($this->qualifyColumn('status'), CommentStatus::Approved->value);
     }
 
     public function scopePending(Builder $query): Builder
     {
-        return $query->where($this->qualifyColumn('status'), self::STATUS_PENDING);
+        return $query->where($this->qualifyColumn('status'), CommentStatus::Pending->value);
     }
 
     /**
@@ -66,12 +70,12 @@ class Comment extends Model
      */
     public function scopeVisibleTo(Builder $query, ?User $user): Builder
     {
-        if ($user && $user->role === 'admin') {
+        if ($user?->isAdmin()) {
             return $query;
         }
 
         return $query->where(function (Builder $q) use ($user) {
-            $q->where($this->qualifyColumn('status'), self::STATUS_APPROVED);
+            $q->where($this->qualifyColumn('status'), CommentStatus::Approved->value);
 
             if ($user) {
                 $q->orWhere($this->qualifyColumn('user_id'), $user->id);

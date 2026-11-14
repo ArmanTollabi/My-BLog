@@ -1,3 +1,24 @@
+import './header';
+import './live-search';
+import './auth';
+import './panel';
+import './confirm-modal';
+import './login-modal';
+import './post-actions';
+import './comments';
+import './back-to-top';
+import './home-carousel';
+import './avatar-upload';
+import './dashboard-avatar';
+import './reading-progress';
+import './post-toc';
+import './editor-image-alt';
+import './admin-dashboard.js';
+import './post-form.js';
+import './post-status.js';
+import './editor-clean.js';
+
+
 // پس‌زمینه‌ی تعاملی: لکه‌ها و ستاره‌ها با ماوس پارالکس می‌گیرند + نوری که دنبال ماوس می‌آید.
 // این کد را در انتهای resources/js/app.js بگذار.
 (() => {

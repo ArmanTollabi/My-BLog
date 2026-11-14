@@ -31,7 +31,7 @@ class SendWelcomeNotification extends Notification
     }
     public function toDatabase(object $notifiable): array{
         return [
-            'message' => 'welcome to our website '.$this->user->name.'!',
+            'message' => $this->user->name.' '.'به سایت ما خوش اومدی '.'!',
         ];
     }
 

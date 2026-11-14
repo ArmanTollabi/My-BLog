@@ -9,32 +9,33 @@
 @php
     $isReply   = $isReply ?? false;
     $isPending = ! $comment->isApproved();
-    $viewerIsAdmin = auth()->user()?->role === 'admin';
+    $viewerIsAdmin = auth()->user()?->isAdmin() ?? false;
     $viewerIsOwner = auth()->id() === $comment->user_id;
+    $author        = $comment->user;                       // ممکن است حذف شده باشد
+    $authorName    = $author?->name ?? 'کاربر حذف‌شده';
 @endphp
 
 <div id="comment-{{ $comment->id }}"
-     class="{{ $isReply ? 'ml-12 mt-5 pl-5 border-l-2 border-gray-200' : 'border-b border-gray-200 py-5' }}">
+     class="cm {{ $isReply ? 'cm-reply' : '' }}">
 
     {{-- هدر: آواتار، نام، تاریخ --}}
     <div class="flex items-center gap-3">
 
-        <div class="{{ $isReply ? 'w-9 h-9' : 'w-12 h-12' }} rounded-full overflow-hidden
-                    flex items-center justify-center font-bold bg-indigo-100 text-fuchsia-900">
-            @if($comment->user->avatar)
-                <img src="{{ Storage::url($comment->user->avatar) }}" alt="" class="w-full h-full object-cover">
+        <div class="pm-avatar {{ $isReply ? 'is-sm' : 'is-md' }}">
+            @if($author?->avatar)
+                <img src="{{ Storage::url($author->avatar) }}" alt="" width="64" height="64" loading="lazy" decoding="async">
             @else
-                {{ mb_substr($comment->user->name, 0, 1) }}
+                {{ mb_substr($authorName, 0, 1) }}
             @endif
         </div>
 
         <div>
-            <p class="font-semibold text-gray-900">
-                {{ $comment->user->name }}
+            <p class="pm-name">
+                {{ $authorName }}
             </p>
 
-            <p class="text-sm text-gray-400">
-                {{ $comment->created_at->format('Y-m-d H:i') }}
+            <p class="pm-sub">
+                {{ $comment->created_at_with_hours_fa }}
             </p>
         </div>
 
@@ -42,13 +43,13 @@
 
     {{-- متن کامنت --}}
     <div id="comment-view-{{ $comment->id }}">
-        <p class="mt-3 text-gray-700">
+        <p class="cm-body">
             {{ $comment->body }}
         </p>
 
         {{-- کامنت تاییدنشده: فقط برای نویسنده (پیش‌نمایش) و ادمین دیده می‌شود --}}
         @if($isPending)
-            <div class="mt-3 rounded-xl border !border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-200">
+            <div class="cm-pending">
                 @if($viewerIsOwner)
                     تا زمانی که این کامنت مورد تایید ادمین قرار نگیرد فقط برای خودتان قابل مشاهده خواهد بود.
                 @else
@@ -56,7 +57,7 @@
                 @endif
 
                 @if($viewerIsAdmin)
-                    <form action="{{ route('admin.comments.approve', $comment) }}" method="POST" class="inline-block mr-2">
+                    <form action="{{ route('admin.comments.approve', $comment) }}" method="POST" class="inline-block me-2">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="btn-create btn-sm">تایید</button>
@@ -76,11 +77,9 @@
 
                 <textarea
                     name="body"
+                    required
                     rows="{{ $isReply ? 3 : 4 }}"
-                    class="w-full px-4 py-3 border border-gray-300
-                           rounded-lg resize-none
-                           focus:outline-none focus:ring-2
-                           focus:ring-indigo-500"
+                    class="field"
                 >{{ $comment->body }}</textarea>
 
                 <div class="flex items-center gap-2 mt-3">
@@ -88,7 +87,7 @@
                         تایید
                     </button>
 
-                    <button type="button" onclick="cancelEdit({{ $comment->id }})" class="btn-cancel btn-sm">
+                    <button type="button" data-comment-action="cancel" data-id="{{ $comment->id }}" class="btn-cancel btn-sm">
                         لغو
                     </button>
                 </div>
@@ -97,20 +96,20 @@
         </div>
     @endcan
 
-    {{-- دکمه‌ها: Reply / ویرایش / حذف (برای کامنت اصلی و ریپلای یکسان) --}}
+    {{-- دکمه‌ها: پاسخ / ویرایش / حذف (برای کامنت اصلی و ریپلای یکسان) --}}
     <div id="comment-actions-{{ $comment->id }}">
-        <div class="flex flex-wrap items-center gap-2 mt-3">
+        <div class="cm-actions">
 
             @auth
                 @if(! $isReply && ! $isPending)
-                    <button type="button" onclick="replyToComment({{ $comment->id }})" class="btn-glass btn-sm">
-                        Reply
+                    <button type="button" data-comment-action="reply" data-id="{{ $comment->id }}" class="btn-glass btn-sm">
+                        پاسخ
                     </button>
                 @endif
             @endauth
 
             @can('update_comment', $comment)
-                <button type="button" onclick="editComment({{ $comment->id }})" class="btn-edit btn-sm">
+                <button type="button" data-comment-action="edit" data-id="{{ $comment->id }}" class="btn-edit btn-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                          stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -122,7 +121,7 @@
 
             @can('delete_comment', $comment)
                 <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="inline"
-                      onsubmit="return confirm('مطمئنی می‌خوای این کامنت رو حذف کنی؟')">
+                      data-confirm="مطمئنی می‌خوای این کامنت رو حذف کنی؟">
                     @csrf
                     @method('DELETE')
 
@@ -150,29 +149,30 @@
                   method="POST" class="hidden mt-4">
                 @csrf
 
-                <textarea name="reply_body" rows="3"
-                          placeholder="Write a reply to {{ $comment->user->name }}"
-                          class="w-full px-4 py-3 border border-gray-300
-                                 rounded-lg resize-none
-                                 focus:outline-none focus:ring-2
-                                 focus:ring-indigo-500"></textarea>
+                <textarea name="reply_body" required rows="3"
+                          placeholder="پاسخ به {{ $authorName }}…"
+                          class="field"></textarea>
 
                 @error('reply_body')
-                <p class="mt-2 text-sm text-red-500">
+                <p class="mt-2 text-sm text-rose-300">
                     {{ $message }}
                 </p>
                 @enderror
 
                 <button type="submit" class="btn-create btn-sm mt-2">
-                    Reply
+                    ثبت پاسخ
                 </button>
             </form>
         @endauth
 
-        {{-- ریپلای‌ها: هر کدام همین قالب را با دکمه‌های خودشان می‌گیرند --}}
-        @foreach($comment->replies as $reply)
-            @include('comments._item', ['comment' => $reply, 'isReply' => true])
-        @endforeach
+        {{-- ریپلای‌ها: داخل باکس کامنت اصلی؛ هر کدام باکس و دکمه‌های خودشان را دارند --}}
+        @if($comment->replies->isNotEmpty())
+            <div class="cm-replies">
+                @foreach($comment->replies as $reply)
+                    @include('comments._item', ['comment' => $reply, 'isReply' => true])
+                @endforeach
+            </div>
+        @endif
 
     @endif
 

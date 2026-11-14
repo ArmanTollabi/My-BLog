@@ -1,10 +1,10 @@
 @extends('layout')
-@section('title','edit-user')
+@section('title','ویرایش کاربر')
 @section('content')
     <section class="max-w-3xl mx-auto px-6 py-12"> <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-white">
-                Edit user : {{$user->name}}
+                ویرایش کاربر : {{$user->name}}
             </h1>
         </div>
 
@@ -17,16 +17,16 @@
         @endif
 
         <!-- Form -->
-        <form action="{{route('users.update',$user)}}" method="POST" class="glass rounded-3xl p-6 md:p-8">
+        <form action="{{route('admin.users.update',$user)}}" method="POST" class="glass rounded-3xl p-6 md:p-8">
             @csrf
             @method('PUT')
 
             <!-- Name -->
             <div class="mb-6">
                 <label for="name" class="block text-sm font-semibold text-white mb-2">
-                    Name:
+                    نام کاربر
                 </label>
-                <input type="text" id="name" name="name" placeholder="Enter name"
+                <input type="text" id="name" name="name" placeholder="نام را وارد کنید"
                        value="{{ old('name', $user->name) }}" required
                        class="glass-input @error('name') !border-rose-400/70 @enderror">
             </div>
@@ -34,24 +34,25 @@
             <!-- Email -->
             <div class="mb-6">
                 <label for="email" class="block text-sm font-semibold text-white mb-2">
-                    Email:
+                    ایمیل
                 </label>
-                <input type="email" id="email" name="email" placeholder="Enter email"
+                <input type="email" id="email" name="email" placeholder="ایمیل را وارد کنید"
                        value="{{ old('email', $user->email) }}" required dir="ltr"
                        class="glass-input text-left @error('email') !border-rose-400/70 @enderror">
             </div>
 
             {{-- User role: فقط ادمین می‌بیند؛ روی حساب خودِ ادمین غیرفعال است --}}
-            @if(auth()->user()->role === 'admin')
+            @if(auth()->user()->isAdmin())
                 @php($isSelf = auth()->id() === $user->id)
                 <div class="mb-6">
                     <label for="role" class="block text-sm font-semibold text-white mb-2">
-                        User role:
+                        نقش کاربر
                     </label>
                     <select id="role" name="role" @disabled($isSelf)
                     class="glass-input @error('role') !border-rose-400/70 @enderror">
-                        <option value="admin" @selected(old('role', $user->role) === 'admin')>Admin</option>
-                        <option value="subscriber" @selected(old('role', $user->role) !== 'admin')>Subscriber</option>
+                        @foreach(\App\Enums\UserRole::cases() as $role)
+                            <option value="{{ $role->value }}" @selected(old('role', $user->role) === $role->value)>{{ $role->label() }}</option>
+                        @endforeach
                     </select>
                     @if($isSelf)
                         <p class="text-white/50 text-xs mt-1">نقش حساب خودت را نمی‌توانی تغییر بدهی.</p>
@@ -69,7 +70,7 @@
                     آواتار
                 </label>
 
-                <div id="upload-box"
+                <div id="upload-box" data-avatar-upload data-upload-url="{{ route('admin.users.upload-avatar') }}"
                      class="border-2 border-dashed border-white/30 rounded-2xl bg-white/5 p-6 text-center
                             transition-colors hover:bg-white/10">
 
@@ -166,94 +167,14 @@
 
             <!-- Buttons -->
             <div class="flex justify-end gap-3">
-                <a  href="{{route('users.index')}}" class="btn-cancel">
-                    Cancel
+                <a  href="{{route('admin.users.index')}}" class="btn-cancel">
+                    انصراف
                 </a>
                 <button type="submit" class="btn-update">
-                    Update User
+                    ذخیره‌ی تغییرات
                 </button>
             </div>
         </form>
     </section>
 
 @endsection
-@push('scripts')
-    <script>
-        const avatarInput = document.getElementById('avatar-input');
-        const uploadBox = document.getElementById('upload-box');
-        const uploadPlaceholder = document.getElementById('upload-placeholder');
-        const avatarPreview = document.getElementById('avatar-preview');
-        const progressWrapper = document.getElementById('progress-wrapper');
-        const progressBar = document.getElementById('progress-bar');
-        const progressText = document.getElementById('progress-text');
-        const uploadSuccess = document.getElementById('upload-success');
-        const avatarPathInput = document.getElementById('avatar_path');
-
-        avatarInput.addEventListener('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-
-            // نمایش پیش‌نمایش عکس فوراً (قبل از تمام شدن آپلود)
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                avatarPreview.src = e.target.result;
-                avatarPreview.classList.remove('hidden');
-                uploadPlaceholder.classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
-
-            // ریست کردن وضعیت قبلی
-            uploadSuccess.classList.add('hidden');
-            uploadBox.classList.remove('border-emerald-400');
-            uploadBox.classList.add('border-white/30');
-            progressWrapper.classList.remove('hidden');
-            progressBar.style.width = '0%';
-            progressText.textContent = '0%';
-            progressText.classList.remove('text-rose-300');
-
-            // ساخت داده فرم برای ارسال فقط همین فایل
-            const formData = new FormData();
-            formData.append('avatar', file);
-            formData.append('_token', document.querySelector('input[name="_csrf"]')?.value
-                || document.querySelector('meta[name="csrf-token"]')?.content
-                || document.querySelector('input[name="_token"]').value);
-
-            // استفاده از XMLHttpRequest به‌جای fetch، چون امکان گزارش درصد پیشرفت رو داره
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '{{ route("users.upload-avatar") }}', true);
-
-            // این بخش، درصد آپلود رو محاسبه و نمایش می‌ده
-            xhr.upload.addEventListener('progress', function (e) {
-                if (e.lengthComputable) {
-                    const percent = Math.round((e.loaded / e.total) * 100);
-                    progressBar.style.width = percent + '%';
-                    progressText.textContent = percent + '%';
-                }
-            });
-
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-
-                    // مسیر عکس رو داخل input مخفی ذخیره می‌کنیم تا با فرم اصلی ارسال بشه
-                    avatarPathInput.value = response.path;
-
-                    progressWrapper.classList.add('hidden');
-                    uploadSuccess.classList.remove('hidden');
-                    uploadBox.classList.remove('border-white/30');
-                    uploadBox.classList.add('border-emerald-400');
-                } else {
-                    progressText.textContent = 'خطا در آپلود، دوباره تلاش کن.';
-                    progressText.classList.add('text-rose-300');
-                }
-            };
-
-            xhr.onerror = function () {
-                progressText.textContent = 'خطا در اتصال به سرور.';
-                progressText.classList.add('text-rose-300');
-            };
-
-            xhr.send(formData);
-        });
-    </script>
-@endpush

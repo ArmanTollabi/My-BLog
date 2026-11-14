@@ -21,8 +21,8 @@
                 <p class="mt-2 text-white/60">برای ادامه، اطلاعات حساب خود را وارد کنید.</p>
             </div>
 
-            <form id="login-form" action="{{ route('login') }}" method="POST"
-                  class="glass rounded-3xl p-8 sm:p-10 space-y-6" novalidate>
+            <form id="login-form" data-submit-lock data-loading-text="در حال ورود…" action="{{ route('login') }}" method="POST"
+                  class="glass rounded-3xl p-8 sm:p-10 space-y-6">
                 @csrf
 
                 {{-- پیام وضعیت (مثلاً بعد از بازیابی رمز) --}}
@@ -64,14 +64,7 @@
 
                 {{-- رمز عبور --}}
                 <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <label for="password" class="block text-sm font-bold text-white">رمز عبور</label>
-
-                        <a href="{{ route('password.request') }}"
-                           class="text-xs font-medium text-violet-300 hover:text-violet-200 transition">
-                            رمز عبور را فراموش کرده‌اید؟
-                        </a>
-                    </div>
+                    <label for="password" class="block text-sm font-bold mb-2 text-white">رمز عبور</label>
 
                     <div class="relative">
                         <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
@@ -88,15 +81,15 @@
                                       @error('password') !border-rose-400/70 @enderror">
 
                         {{-- نمایش/مخفی کردن رمز --}}
-                        <button type="button" id="toggle-password"
+                        <button type="button" data-toggle-password="password"
                                 class="absolute inset-y-0 right-3 my-auto h-9 w-9 grid place-items-center rounded-xl
                                        text-white/55 hover:text-white hover:bg-white/10 transition cursor-pointer"
                                 aria-label="نمایش رمز عبور" aria-pressed="false">
-                            <svg id="eye-open" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                            <svg data-eye-open class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.04 12.32a1.01 1.01 0 010-.64C3.42 7.51 7.36 4.5 12 4.5c4.64 0 8.58 3.01 9.96 7.18.07.21.07.43 0 .64C20.58 16.49 16.64 19.5 12 19.5c-4.64 0-8.58-3.01-9.96-7.18z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            <svg id="eye-closed" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                            <svg data-eye-closed class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.22A10.48 10.48 0 001.93 12c1.29 4.06 5.07 7.5 10.07 7.5 1.99 0 3.84-.55 5.42-1.5M6.23 6.23A10.45 10.45 0 0112 4.5c5 0 8.78 3.44 10.07 7.5a10.52 10.52 0 01-4.29 5.77M6.23 6.23L3 3m3.23 3.23l3.65 3.65m7.89 7.89L21 21m-3.23-3.23l-3.65-3.65m0 0a3 3 0 10-4.24-4.24m4.24 4.24L9.88 9.88"/>
                             </svg>
                         </button>
@@ -112,22 +105,29 @@
                     @enderror
                 </div>
 
-                {{-- مرا به خاطر بسپار --}}
-                <label class="flex items-center gap-2.5 text-sm text-white/70 cursor-pointer select-none w-fit">
-                    <input type="checkbox" name="remember" value="1"
-                           class="w-4 h-4 rounded accent-violet-500 cursor-pointer"
-                        {{ old('remember') ? 'checked' : '' }}>
-                    من را به خاطر بسپار
-                </label>
+                {{-- مرا به خاطر بسپار + فراموشی رمز --}}
+                <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                    <label class="flex items-center gap-2.5 text-sm text-white/70 cursor-pointer select-none w-fit">
+                        <input type="checkbox" name="remember" value="1"
+                               class="w-4 h-4 rounded accent-violet-500 cursor-pointer"
+                            {{ old('remember') ? 'checked' : '' }}>
+                        من را به خاطر بسپار
+                    </label>
+
+                    <a href="{{ route('password.request') }}"
+                       class="text-sm text-violet-300 hover:text-violet-200 transition">
+                        فراموشی رمز عبور؟
+                    </a>
+                </div>
 
                 {{-- دکمه ورود --}}
-                <button type="submit" id="login-btn"
+                <button type="submit" data-submit-btn
                         class="glass-btn-primary w-full justify-center py-3.5 text-base disabled:opacity-70 disabled:cursor-wait">
-                    <svg id="login-spinner" class="hidden w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg data-spinner class="hidden w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                     </svg>
-                    <span id="login-label">ورود</span>
+                    <span data-label>ورود</span>
                 </button>
 
                 {{-- ثبت‌نام --}}
@@ -142,43 +142,5 @@
 
         </div>
     </div>
-
-    <script>
-        (function () {
-            const pwd = document.getElementById('password');
-            const toggle = document.getElementById('toggle-password');
-            const open = document.getElementById('eye-open');
-            const closed = document.getElementById('eye-closed');
-            const form = document.getElementById('login-form');
-            const btn = document.getElementById('login-btn');
-            const spinner = document.getElementById('login-spinner');
-            const label = document.getElementById('login-label');
-
-            // نمایش / مخفی کردن رمز عبور
-            toggle.addEventListener('click', function () {
-                const show = pwd.type === 'password';
-                pwd.type = show ? 'text' : 'password';
-                open.classList.toggle('hidden', show);
-                closed.classList.toggle('hidden', !show);
-                toggle.setAttribute('aria-pressed', show ? 'true' : 'false');
-                toggle.setAttribute('aria-label', show ? 'مخفی کردن رمز عبور' : 'نمایش رمز عبور');
-                pwd.focus();
-            });
-
-            // جلوگیری از ارسال دوباره + نمایش حالت «در حال ورود»
-            form.addEventListener('submit', function () {
-                btn.disabled = true;
-                spinner.classList.remove('hidden');
-                label.textContent = 'در حال ورود…';
-            });
-
-            // اگر کاربر با دکمه برگشت مرورگر برگشت، دکمه دوباره فعال شود
-            window.addEventListener('pageshow', function () {
-                btn.disabled = false;
-                spinner.classList.add('hidden');
-                label.textContent = 'ورود';
-            });
-        })();
-    </script>
 
 @endsection

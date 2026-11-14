@@ -23,40 +23,40 @@
     // ساختار منو: 'active' الگوی route برای باز بودن خودکار گروه، 'route' برای هر لینک
     $menu = [
         [
-            'label'  => 'Categories',
+            'label'  => 'دسته‌بندی‌ها',
             'icon'   => 'folder',
             'active' => 'categories.*',
             'items'  => [
-                ['label' => 'Create Category', 'route' => 'categories.create', 'icon' => 'plus'],
-                ['label' => 'View Categories', 'route' => 'categories.index',  'icon' => 'list'],
+                ['label' => 'ایجاد دسته‌بندی', 'route' => 'categories.create', 'icon' => 'plus'],
+                ['label' => 'مشاهده‌ی دسته‌بندی‌ها', 'route' => 'categories.index',  'icon' => 'list'],
             ],
         ],
         [
-            'label'  => 'Tags',
+            'label'  => 'تگ‌ها',
             'icon'   => 'hash',
             'active' => 'tags.*',
             'items'  => [
-                ['label' => 'Create Tag', 'route' => 'tags.create', 'icon' => 'plus'],
-                ['label' => 'View Tags',  'route' => 'tags.index',  'icon' => 'list'],
+                ['label' => 'ایجاد تگ', 'route' => 'tags.create', 'icon' => 'plus'],
+                ['label' => 'مشاهده‌ی تگ‌ها',  'route' => 'tags.index',  'icon' => 'list'],
             ],
         ],
         [
-            'label'  => 'Users',
+            'label'  => 'کاربران',
             'icon'   => 'users',
             'active' => 'users.*',
             'items'  => [
-                ['label' => 'Create User', 'route' => 'users.create', 'icon' => 'addUser'],
-                ['label' => 'View Users',  'route' => 'users.index',  'icon' => 'users'],
+                ['label' => 'ایجاد کاربر', 'route' => 'admin.users.create', 'icon' => 'addUser'],
+                ['label' => 'مشاهده‌ی کاربران',  'route' => 'admin.users.index',  'icon' => 'users'],
             ],
         ],
         [
-            'label'  => 'Comments',
+            'label'  => 'کامنت‌ها',
             'icon'   => 'chat',
             'active' => 'admin.comments.*',
             'admin'  => true, // فقط برای ادمین نمایش داده می‌شود
             'items'  => [
-                ['label' => 'All Comments', 'route' => 'admin.comments.index', 'icon' => 'list'],
-                ['label' => 'Trash',        'route' => 'admin.comments.trash', 'icon' => 'trash'],
+                ['label' => 'همه‌ی کامنت‌ها', 'route' => 'admin.comments.index', 'icon' => 'list'],
+                ['label' => 'سطل زباله', 'route' => 'admin.comments.trash', 'icon' => 'trash'],
             ],
         ],
     ];
@@ -66,31 +66,31 @@
 
 {{-- دکمه باز کردن منو (بالاتر از هدر) --}}
 <button type="button" id="sidebar-button" class="btn-icon sidebar-toggle"
-        aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
+        aria-label="باز کردن منو" aria-controls="sidebar" aria-expanded="false">
     {!! $svg('bars', 'w-6 h-6') !!}
 </button>
 
 {{-- پس‌زمینه تار --}}
 <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
 
-<aside id="sidebar" class="sidebar" aria-label="Sidebar" aria-hidden="true">
+<aside id="sidebar" class="sidebar" aria-label="نوار کناری" aria-hidden="true">
 
     {{-- Header --}}
     <div class="sidebar-head">
         <span class="sidebar-logo">{!! $svg('shield', 'w-6 h-6') !!}</span>
 
         <h2 class="sidebar-title">
-            Admin Panel
-            <small>Manage your content</small>
+            پنل مدیریت
+            <small>مدیریت محتوای سایت</small>
         </h2>
 
-        <button type="button" id="sidebar-close" class="sidebar-close" aria-label="Close menu">
+        <button type="button" id="sidebar-close" class="sidebar-close" aria-label="بستن منو">
             {!! $svg('x', 'w-5 h-5') !!}
         </button>
     </div>
 
     {{-- Navigation --}}
-    <nav class="sidebar-nav" aria-label="Admin navigation">
+    <nav class="sidebar-nav" aria-label="منوی مدیریت">
 
         @foreach ($menu as $i => $group)
             @continue(($group['admin'] ?? false) && ! $isAdmin)

@@ -1,6 +1,6 @@
 @extends('layout')
 
-@section('title', 'Forgot Password')
+@section('title', 'فراموشی رمز عبور')
 
 @section('content')
 
@@ -20,17 +20,17 @@
                 </div>
 
                 <h1 class="text-3xl font-extrabold text-white">
-                    Forgot your password?
+                    رمز عبور خود را فراموش کرده اید؟
                 </h1>
 
                 <p class="mt-2 text-white/60">
-                    Enter your email address and we'll send you a password reset link.
+                    ایمیلی که باهاش داخل سایت ثبت نام کردید رو وارد کنید،لینک بازیابی رمز عبور براتون ارسال میشه!
                 </p>
 
             </div>
 
-            <form id="forgot-form" action="{{ route('password.email') }}" method="POST"
-                  class="glass rounded-3xl p-8 sm:p-10 space-y-6" novalidate>
+            <form id="forgot-form" data-submit-lock data-loading-text="در حال ارسال…" action="{{ route('password.email') }}" method="POST"
+                  class="glass rounded-3xl p-8 sm:p-10 space-y-6">
 
                 @csrf
 
@@ -49,7 +49,7 @@
                 {{-- Email --}}
                 <div>
                     <label for="email" class="block text-sm font-bold mb-2 text-white">
-                        Email address
+                        ایمیل
                     </label>
 
                     <div class="relative">
@@ -78,20 +78,20 @@
                 </div>
 
                 {{-- Submit --}}
-                <button type="submit" id="forgot-btn"
+                <button type="submit" data-submit-btn
                         class="glass-btn-primary w-full justify-center py-3.5 text-base disabled:opacity-70 disabled:cursor-wait">
-                    <svg id="forgot-spinner" class="hidden w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg data-spinner class="hidden w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                     </svg>
-                    <span id="forgot-label">Send Password Reset Link</span>
+                    <span data-label>ارسال لینک بازیابی رمز عبور</span>
                 </button>
 
                 {{-- Back to login --}}
                 <div class="pt-5 border-t border-white/10 text-center">
                     <a href="{{ route('login') }}"
                        class="text-sm font-medium text-violet-300 hover:text-violet-200 transition">
-                        ← Back to Login
+                         برگشت به صفحه ورود←
                     </a>
                 </div>
 
@@ -100,28 +100,5 @@
         </div>
 
     </div>
-
-    <script>
-        (function () {
-            const form = document.getElementById('forgot-form');
-            const btn = document.getElementById('forgot-btn');
-            const spinner = document.getElementById('forgot-spinner');
-            const label = document.getElementById('forgot-label');
-
-            // جلوگیری از ارسال دوباره (هر ارسال یک ایمیل می‌فرستد)
-            form.addEventListener('submit', function () {
-                btn.disabled = true;
-                spinner.classList.remove('hidden');
-                label.textContent = 'Sending…';
-            });
-
-            // اگر کاربر با دکمه برگشت مرورگر برگشت، دکمه دوباره فعال شود
-            window.addEventListener('pageshow', function () {
-                btn.disabled = false;
-                spinner.classList.add('hidden');
-                label.textContent = 'Send Password Reset Link';
-            });
-        })();
-    </script>
 
 @endsection

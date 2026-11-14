@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title')</title>
-
+    <title>@hasSection('title')@yield('title') | @endif MyBlog</title>
+    @stack('head')
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
     @if(Route::currentRouteName() === 'posts.index')
@@ -13,21 +13,14 @@
     @endif
 </head>
 <section class="glass border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-6 pt-5 pb-10 md:pb-12">
+    <div class="hdr-wrap max-w-7xl mx-auto px-6 pt-5 pb-5">
 
         {{-- ===== نوار بالا: لوگو + نوتیفیکیشن + پنل کاربری ===== --}}
-        @php
-            // کتگوری‌هایی که حداقل یک پست دارند (برای زیرمنوی Posts)
-            $navCategories = \App\Models\Category::has('posts')->withCount('posts')->orderBy('title')->get();
-            $routeCategory = request()->route('category');
-            $routeCategoryId = $routeCategory instanceof \App\Models\Category ? $routeCategory->id : $routeCategory;
-        @endphp
+        <div class="hdr-row flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
 
-        <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-
-            {{-- لوگو: کلیک = رفتن به /posts (فاصله‌ی چپ برای دکمه‌ی ثابت سایدبار) --}}
-            <a href="{{ route('home') }}" class="brand ml-12 min-[1400px]:ml-0"
-               aria-label="MyBlog — Posts">
+            {{-- لوگو: کلیک = رفتن به صفحه اصلی (ms-12: فاصله‌ی شروع برای دکمه‌ی ثابت سایدبار که در RTL سمت راست است) --}}
+            <a href="{{ route('home') }}" class="brand ms-12 min-[1400px]:ms-0"
+               aria-label="MyBlog — صفحه اصلی">
                 <span class="brand-mark">
                     <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                          stroke-width="1.8" stroke="currentColor" aria-hidden="true">
@@ -39,7 +32,8 @@
             </a>
 
             {{-- ===== منوی ناوبری: Home + Posts (کشویی) ===== --}}
-            <nav class="site-nav order-3 basis-full md:order-none md:basis-auto" aria-label="Main">
+            @unless(request()->routeIs('dashboard', 'dashboard.*', 'admin.*'))
+            <nav class="site-nav order-3 basis-full md:order-none md:basis-auto" aria-label="منوی اصلی">
 
                 <a href="{{ route('home') }}"
                    class="nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}"
@@ -49,7 +43,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
                     </svg>
-                    Home
+                    خانه
                 </a>
 
                 <div class="nav-dd {{ request()->routeIs('posts.*', 'categories.show') ? 'is-active' : '' }}" id="posts-nav">
@@ -59,11 +53,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
                         </svg>
-                        Posts
+                        پست‌ها
                     </a>
 
                     <button type="button" class="nav-caret" id="posts-nav-toggle"
-                            aria-label="Categories" aria-haspopup="true" aria-expanded="false" aria-controls="posts-nav-panel">
+                            aria-label="دسته‌بندی‌ها" aria-haspopup="true" aria-expanded="false" aria-controls="posts-nav-panel">
                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                              stroke-width="2" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
@@ -79,35 +73,45 @@
 
                             @forelse($navCategories as $navCategory)
                                 <a href="{{ route('categories.show', $navCategory) }}"
-                                   class="nav-sub {{ request()->routeIs('categories.show') && (int) $routeCategoryId === $navCategory->id ? 'is-active' : '' }}">
+                                   class="nav-sub {{ request()->routeIs('categories.show') && (int) $navActiveCategoryId === $navCategory->id ? 'is-active' : '' }}">
                                     <span class="truncate">{{ $navCategory->title }}</span>
                                 </a>
                             @empty
-                                <p class="px-3 py-2 text-sm text-white/50">هنوز کتگوری‌ای پست ندارد.</p>
+                                <p class="px-3 py-2 text-sm text-white/50">هنوز دسته‌ای پست ندارد.</p>
                             @endforelse
                         </div>
                     </div>
                 </div>
 
             </nav>
+            @endunless
 
-            <div class="flex items-center gap-3">
+            {{-- relative: هر دو کشو (اعلان‌ها و منوی کاربر) به همین گروه می‌چسبند، نه به دکمه‌ی خودشان.
+                 چون گروه کنار لبه‌ی صفحه است، کشو با inline-end هم‌لبه می‌شود و به داخل صفحه باز می‌شود (نه بیرون) --}}
+            <div class="hdr-actions relative flex items-center gap-3">
+
+                {{-- جستجوی سراسری (پنجره‌ی جستجو: layouts/_live-search) --}}
+                <button type="button" class="btn-icon" data-open-search aria-label="جستجو (کلید /)" title="جستجو ( / )">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                         stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+                    </svg>
+                </button>
 
                 @auth
                     @php
+                        // $notifications و $unreadCount را HeaderComposer می‌فرستد
                         $user = auth()->user();
-                        $notifications = $user->notifications()->latest()->get();
-                        $unreadCount = $user->unreadNotifications()->count();
                     @endphp
 
                     {{-- نوتیفیکیشن --}}
-                    <div class="relative">
+                    <div>
 
                         <button
                             type="button"
                             id="notification-button"
-                            class="btn-icon"
-                            aria-label="Notifications"
+                            class="btn-icon relative"
+                            aria-label="اعلان‌ها"
                             aria-haspopup="true"
                             aria-expanded="false"
                         >
@@ -115,7 +119,7 @@
 
                             @if($unreadCount > 0)
                                 <span
-                                    class="absolute -top-1 -right-1
+                                    class="absolute -top-1 -end-1
                                            bg-rose-500 text-white
                                            text-xs font-bold
                                            w-5 h-5 rounded-full
@@ -129,14 +133,14 @@
 
                         <div
                             id="notification-dropdown"
-                            class="hidden absolute right-0 mt-3 w-80 max-w-[calc(100vw-2rem)]
+                            class="hidden absolute end-0 top-full mt-3 w-80 max-w-[calc(100vw-2rem)]
                                    bg-white border border-gray-200
                                    rounded-xl shadow-lg z-50"
                         >
 
                             <div class="px-4 py-3 border-b border-gray-200">
                                 <h3 class="font-bold text-gray-900">
-                                    Notifications
+                                    اعلان‌ها
                                 </h3>
                             </div>
 
@@ -159,14 +163,14 @@
                                         </p>
 
                                         <p class="text-xs text-gray-400 mt-1">
-                                            {{ $notification->created_at->format('Y-m-d H:i') }}
+                                            {{ $notification->created_at_with_hours_fa }}
                                         </p>
                                     </a>
 
                                 @empty
 
                                     <p class="px-4 py-6 text-center text-gray-400">
-                                        No notifications yet.
+                                        هنوز اعلانی ندارید.
                                     </p>
 
                                 @endforelse
@@ -177,7 +181,7 @@
                     </div>
 
                     {{-- پنل کاربری (دراپ‌داون) --}}
-                    <div class="relative">
+                    <div>
 
                         <button
                             type="button"
@@ -203,7 +207,7 @@
                             </svg>
                         </button>
 
-                        <div id="user-dropdown" class="menu-panel hidden" role="menu" aria-label="User menu">
+                        <div id="user-dropdown" class="menu-panel hidden" role="menu" aria-label="منوی کاربر">
 
                             {{-- اطلاعات کوتاه کاربر --}}
                             <div class="menu-user">
@@ -221,7 +225,7 @@
                                 </div>
                             </div>
                             {{-- داشبورد --}}
-                            @if(auth()->user()->role === 'admin')
+                            @if($user->isAdmin())
                                 <a href="{{ route('admin.dashboard') }}" class="menu-item" role="menuitem">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-shield preview-icon"><path d="M10 15H6a4 4 0 0 0-4 4v2"/><path d="M22 17.5c0 2.499-1.75 3.749-3.83 4.474a.5.5 0 0 1-.335-.005c-2.085-.72-3.835-1.97-3.835-4.47V14a.5.5 0 0 1 .5-.499c1 0 2.25-.6 3.12-1.36a.6.6 0 0 1 .76-.001c.875.765 2.12 1.36 3.12 1.36a.5.5 0 0 1 .5.5z"/><circle cx="9" cy="7" r="4"/>
                                     </svg>
@@ -239,7 +243,7 @@
 
                             {{-- کاربران --}}
                             @can('isAdmin',$user)
-                                <a href="{{ route('users.index') }}" class="menu-item" role="menuitem">
+                                <a href="{{ route('admin.users.index') }}" class="menu-item" role="menuitem">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user preview-icon"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                                     </svg>
                                     کاربران
@@ -264,127 +268,18 @@
                 {{-- مهمان --}}
                 @guest
                     <a href="{{ route('login') }}" class="btn-glass">
-                        Login
+                        ورود
                     </a>
 
                     <a href="{{ route('register') }}" class="btn-create">
-                        Register
+                        ثبت‌نام
                     </a>
                 @endguest
 
             </div>
         </div>
 
-        {{-- ===== عنوان صفحه ===== --}}
-        <div class="mt-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-
-            <div>
-                <h1 class="text-3xl md:text-4xl font-bold text-white">
-                    @if(request()->routeIs('users.*'))
-                        Users
-                    @else
-                        @if(! request()->routeIs('home'))
-                        Latest Posts
-                        @endif
-                    @endif
-                </h1>
-                @if(!  (request()->routeIs('home') ||  request()->routeIs('users.*')))
-                <p class="mt-2 text-white/60">
-                    Explore the latest posts and articles.
-                </p>
-                @endif
-            </div>
-
-            @auth
-                @if(request()->routeIs('users.*'))
-                    @if(Route::currentRouteName() !== 'users.create')
-                        <a href="{{ route('users.create') }}" class="btn-create self-start md:self-auto">
-                            + Create User
-                        </a>
-                    @endif
-                @else
-                    @can('create', \App\Models\Post::class)
-                        <a href="{{ route('posts.create') }}" class="btn-create self-start md:self-auto">
-                            + Create Post
-                        </a>
-                    @endcan
-                @endif
-            @endauth
-
-        </div>
-
     </div>
 </section>
-<script>
-    // زیرمنوی Posts: با ماوس (هاور) باز می‌شود؛ روی موبایل/کیبورد با دکمه‌ی فلش
-    (function () {
-        const dd = document.getElementById('posts-nav');
-        const toggle = document.getElementById('posts-nav-toggle');
-        if (!dd || !toggle) return;
 
-        function setOpen(open) {
-            dd.classList.toggle('is-open', open);
-            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        }
-
-        toggle.addEventListener('click', function (e) {
-            e.stopPropagation();
-            setOpen(!dd.classList.contains('is-open'));
-        });
-        document.addEventListener('click', function (e) { if (!dd.contains(e.target)) setOpen(false); });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && dd.classList.contains('is-open')) { setOpen(false); toggle.focus(); }
-        });
-    })();
-</script>
-<script>
-    (function () {
-        // نوتیفیکیشن و پنل کاربری: هر دو دراپ‌داون با یک منطق مشترک
-        const pairs = [
-            ['notification-button', 'notification-dropdown'],
-            ['user-menu-button', 'user-dropdown']
-        ].map(function (ids) {
-            return {
-                button: document.getElementById(ids[0]),
-                panel: document.getElementById(ids[1])
-            };
-        }).filter(function (p) { return p.button && p.panel; });
-
-        // برای مهمان‌ها این المان‌ها وجود ندارند
-        if (!pairs.length) return;
-
-        function setOpen(p, open) {
-            p.panel.classList.toggle('hidden', !open);
-            p.button.setAttribute('aria-expanded', open ? 'true' : 'false');
-        }
-
-        function closeAll(except) {
-            pairs.forEach(function (p) { if (p !== except) setOpen(p, false); });
-        }
-
-        pairs.forEach(function (p) {
-            p.button.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const willOpen = p.panel.classList.contains('hidden');
-                closeAll(p);            // با باز شدن یکی، دیگری بسته می‌شود
-                setOpen(p, willOpen);
-            });
-        });
-
-        // بستن با کلیک بیرون یا Esc
-        document.addEventListener('click', function (e) {
-            pairs.forEach(function (p) {
-                if (!p.panel.contains(e.target)) setOpen(p, false);
-            });
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key !== 'Escape') return;
-            pairs.forEach(function (p) {
-                if (!p.panel.classList.contains('hidden')) {
-                    setOpen(p, false);
-                    p.button.focus();
-                }
-            });
-        });
-    })();
-</script>
+@include('layouts._live-search')

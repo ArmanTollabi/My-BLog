@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CommentStatus;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Notifications\NewCommentNotification;
@@ -17,19 +18,20 @@ class CommentController extends Controller
             'body' => 'required|min:3|max:100',
         ]);
 
-        // کامنت ادمین مستقیم تایید می‌شود؛ بقیه منتظر تایید می‌مانند
-        $approved = $request->user()->role === 'admin';
+        // کامنت ادمین مستقیم تایید می‌شود؛ بقیه منتظر تایید می‌مانند (قانون در CommentStatus::forAuthor)
+        $status = CommentStatus::forAuthor($request->user());
+        $approved = $status === CommentStatus::Approved;
 
         $comment = Comment::create([
             'user_id' => $request->user()->id,
             'post_id' => $post->id,
             'body'    => $request->body,
-            'status'  => $approved ? Comment::STATUS_APPROVED : Comment::STATUS_PENDING,
+            'status'  => $status->value,
         ]);
 
-        // نوتیفیکیشن فقط برای کامنت تاییدشده (برای بقیه، بعد از تایید ادمین ارسال می‌شود)
+        // null-safe: اگر نویسنده‌ی پست حذف شده باشد خطا نمی‌دهد
         if ($approved) {
-            $post->user->notify(new NewCommentNotification($comment));
+            $post->user?->notify(new NewCommentNotification($comment));
         }
 
         return back()->with('success', $approved ? 'کامنت با موفقیت ثبت شد.' : self::PENDING_MESSAGE);
@@ -43,12 +45,13 @@ class CommentController extends Controller
             'body' => 'required|min:3|max:100',
         ]);
 
-        $approved = $request->user()->role === 'admin';
+        $status = CommentStatus::forAuthor($request->user());
+        $approved = $status === CommentStatus::Approved;
 
         $comment->update([
             'body'   => $request->body,
             // ویرایش کامنت توسط کاربر عادی، دوباره نیاز به تایید دارد
-            'status' => $approved ? Comment::STATUS_APPROVED : Comment::STATUS_PENDING,
+            'status' => $status->value,
         ]);
 
         return back()->with(
@@ -76,14 +79,15 @@ class CommentController extends Controller
             'reply_body' => 'required|min:3|max:100',
         ]);
 
-        $approved = $request->user()->role === 'admin';
+        $status = CommentStatus::forAuthor($request->user());
+        $approved = $status === CommentStatus::Approved;
 
         Comment::create([
             'user_id'   => $request->user()->id,
             'post_id'   => $comment->post_id,
             'parent_id' => $comment->id,
             'body'      => $request->reply_body,
-            'status'    => $approved ? Comment::STATUS_APPROVED : Comment::STATUS_PENDING,
+            'status'    => $status->value,
         ]);
 
         return back()->with('success', $approved ? 'پاسخ با موفقیت ثبت شد.' : self::PENDING_MESSAGE);

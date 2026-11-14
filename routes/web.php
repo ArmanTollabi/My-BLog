@@ -1,122 +1,147 @@
 <?php
 
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\TagController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\AdminCommentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminPostController;
-use App\Http\Middleware\EnsureAdmin;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostLikeController;
-use function Pest\Laravel\put;
+use App\Http\Controllers\PostSaveController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\UserController;
+use App\Http\Middleware\EnsureAdmin;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SeoController;
 
+Route::get('robots.txt', [SeoController::class, 'robots']);
+Route::get('sitemap.xml', [SeoController::class, 'sitemap']);
+
+/*
+|--------------------------------------------------------------------------
+| صفحات عمومی
+|--------------------------------------------------------------------------
+*/
+
+//خانه
 Route::get('/', [PostController::class, 'home'])->name('home');
 
-Route::get('/blog', function () {
-    return view('blog');
-})->name('blog');
+//سرچ
+Route::get('posts/search', [PostController::class, 'search'])->name('posts.search')->middleware('throttle:40,1');
 
-//posts
-Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+/*
+|--------------------------------------------------------------------------
+| مهمان (guest)
+|--------------------------------------------------------------------------
+*/
 
+Route::middleware('guest')->prefix('auth')->group(function () {
+    Route::get('register', [RegisterController::class, 'ShowRegisterForm'])->name('register');
+    Route::post('register', [RegisterController::class, 'Register'])->middleware('throttle:3,30')->name('register');
 
+    Route::get('login', [LoginController::class, 'ShowLoginForm'])->name('login');
+    Route::post('login', [LoginController::class, 'Login'])->name('login');
 
-Route::resource('posts', PostController::class)->only(['index', 'show']);
+    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->middleware('throttle:3,30')->name('password.email');
 
-Route::middleware('auth')->group(function () { //users & posts auth
+    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('reset-password', [NewPasswordController::class, 'store'])->middleware('throttle:3,30')->name('password.update');
+});
+
+/*
+|--------------------------------------------------------------------------
+| کاربر لاگین‌کرده (auth)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+
+    Route::post('logout', [LoginController::class, 'Logout'])->name('logout');
+
+    // ── پست‌ها (create/store/edit/update/destroy) ──
+    // نکته: باید قبل از index/show عمومی ثبت بشه تا posts/create با posts/{post} قاطی نشه.
     Route::resource('posts', PostController::class)->except(['index', 'show']);
-    Route::resource('users', UserController::class);
-    //post likes
-    Route::post('/posts/{post}/like', [PostLikeController::class, 'toggle'])
-        ->middleware(['auth', 'throttle:60,1'])
-        ->name('posts.like');
-    //notifs
-    Route::get('/notifications/{notification}', [NotificationController::class, 'read'])->name('notifications.read');
-});
 
-Route::middleware('auth')->group(function () { //upload
-    Route::post('/posts/upload-image', [PostController::class, 'uploadImage'])->name('posts.upload-image');
-    Route::post('/users/upload-avatar', [UserController::class, 'uploadAvatar'])->name('users.upload-avatar');
-});
+    Route::prefix('posts')->name('posts.')->group(function () {
+        Route::post('upload-image', [PostController::class, 'uploadImage'])->name('upload-image');
+        Route::post('{post}/save', [PostSaveController::class, 'toggle'])->middleware('throttle:20,1')->name('save');
+        Route::post('{post}/like', [PostLikeController::class, 'toggle'])->name('like');
+    });
 
-Route::middleware('auth')->group(function () { //comments
-    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
-    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-    //reply
-    Route::post('comments/{comment}/reply', [CommentController::class, 'reply'])->name('comments.reply');
-});
+    // ── کامنت‌ها ──
+    Route::post('posts/{post}/comments', [CommentController::class, 'store'])->middleware('throttle:5,1')->name('comments.store');
+    Route::put('comments/{comment}', [CommentController::class, 'update'])->middleware('throttle:5,1')->name('comments.update');
+    Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::post('comments/{comment}/reply', [CommentController::class, 'reply'])->middleware('throttle:5,1')->name('comments.reply');
 
-// ───────── پنل ادمین (فقط role === 'admin') ─────────
-Route::middleware(['auth', EnsureAdmin::class])->prefix('admin')->name('admin.')->group(function () {
+    // ── نوتیفیکیشن‌ها ──
+    Route::get('notifications/{notification}', [NotificationController::class, 'read'])->name('notifications.read');
 
-    // آمار
-    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+    // ── دسته‌بندی‌ها (عملیات مدیریتی) ──
+    Route::resource('categories', CategoryController::class)->only(['create', 'store', 'destroy']);
 
-    // پست‌ها
-    Route::get('/posts', [AdminPostController::class, 'index'])->name('posts.index');
+    // ── تگ‌ها ──
+    Route::resource('tags', TagController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
 
-    // کامنت‌ها
-    Route::prefix('comments')->name('comments.')->controller(AdminCommentController::class)->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::get('/trash', 'trash')->name('trash');
-        Route::patch('/{comment}/approve', 'approve')->name('approve');
-        Route::patch('/{comment}/unapprove', 'unapprove')->name('unapprove');
-        Route::delete('/{comment}', 'destroy')->name('destroy');
-        Route::patch('/{comment}/restore', 'restore')->name('restore')->withTrashed();
-        Route::delete('/{comment}/force', 'forceDelete')->name('force')->withTrashed();
+    // ── داشبورد کاربر ──
+    Route::prefix('dashboard')->name('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'index']);
+        Route::get('comments', [DashboardController::class, 'comments'])->name('.comments');
+        Route::get('posts', [DashboardController::class, 'posts'])->name('.posts');
+        Route::get('bookmarks', [DashboardController::class, 'bookmarks'])->name('.bookmarks');
+
+        Route::post('avatar', [DashboardController::class, 'updateAvatar'])->name('.avatar');
+        Route::delete('avatar', [DashboardController::class, 'destroyAvatar'])->name('.avatar.destroy');
+
+        Route::put('profile', [DashboardController::class, 'updateProfile'])->name('.profile');
+        Route::put('password', [DashboardController::class, 'updatePassword'])->name('.password');
     });
 });
 
+/*
+|--------------------------------------------------------------------------
+| پست‌ها و دسته‌بندی‌ها (عمومی)
+| باید بعد از گروه auth بیان تا create با {post} / {category} قاطی نشه.
+|--------------------------------------------------------------------------
+*/
 
-Route::middleware('auth')->group(function () { //categories
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-    Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
-    Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
-    Route::post('/categories/',[CategoryController::class, 'store'])->name('categories.store');
-    Route::delete('category/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-});
+Route::resource('posts', PostController::class)->only(['index', 'show']);
+Route::resource('categories', CategoryController::class)->only(['index', 'show']);
 
-Route::middleware('auth')->group(function () { //dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::put('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('dashboard.profile');
-    Route::post('/dashboard/avatar', [DashboardController::class, 'updateAvatar'])->name('dashboard.avatar');
-    Route::delete('/dashboard/avatar', [DashboardController::class, 'destroyAvatar'])->name('dashboard.avatar.destroy');
-    Route::put('/dashboard/password', [DashboardController::class, 'updatePassword'])->name('dashboard.password');
-});
+/*
+|--------------------------------------------------------------------------
+| پنل ادمین (فقط role === 'admin')
+|--------------------------------------------------------------------------
+*/
 
-Route::middleware('auth')->group(function () { //tags
-    Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
-    Route::get('/tags/create', [TagController::class, 'create'])->name('tags.create');
-    Route::get('tags/{tag}', [TagController::class, 'show'])->name('tags.show');
-    Route::post('/tags', [TagController::class, 'store'])->name('tags.store');
-    Route::delete('/tags/{tag}', [TagController::class, 'destroy'])->name('tags.destroy');
-});
+Route::middleware(['auth', EnsureAdmin::class])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-Route::middleware('guest')->group(function () {
-    Route::get('auth/register',[RegisterController::class,'ShowRegisterForm'])->name('register');
-    Route::post('auth/register',[RegisterController::class,'Register'])->name('register');
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('posts', [AdminPostController::class, 'index'])->name('posts.index');
 
-    Route::get('auth/login',[LoginController::class,'ShowLoginForm'])->name('login');
-    Route::post('auth/login',[LoginController::class,'Login'])->name('login');
-
-    Route::get('auth/forgot-password',[PasswordResetLinkController::class,'create'])->name('password.request');
-    Route::post('auth/forgot-password',[PasswordResetLinkController::class,'store'])->name('password.email');
-
-    Route::get('auth/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-    Route::post('auth/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
-});
-
-Route::middleware('auth')->group(function () {
-    Route::post('/logout',[LoginController::class,'Logout'])->name('logout');
-});
+        // ── کاربران ──
+        Route::post('users/upload-avatar', [UserController::class, 'uploadAvatar'])->name('users.upload-avatar');
+        Route::resource('users', UserController::class);
+        // ── کامنتها ──
+        Route::prefix('comments')->name('comments.')->controller(AdminCommentController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('trash', 'trash')->name('trash');
+            Route::patch('{comment}/approve', 'approve')->name('approve');
+            Route::patch('{comment}/unapprove', 'unapprove')->name('unapprove');
+            Route::delete('{comment}', 'destroy')->name('destroy');
+            Route::patch('{comment}/restore', 'restore')->name('restore')->withTrashed();
+            Route::delete('comments/trash/empty', [AdminCommentController::class, 'emptyTrash'])->name('trash.empty');
+            Route::delete('{comment}/force', 'forceDelete')->name('force')->withTrashed();
+           // Route::delete('{comments}/forceAll', 'destroyAll')->name('forceAll')->withTrashed();
+        });
+    });

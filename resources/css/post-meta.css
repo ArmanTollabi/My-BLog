@@ -1,0 +1,24 @@
+/* خط «نویسنده + تاریخ» — مارکاپ: views/posts/_meta.blade.php (در کارت‌ها، صفحه‌ی پست، تگ و دسته) */
+.pmeta { display: flex; align-items: center; gap: .6rem; min-width: 0; }
+.pm-avatar {
+    flex: none; display: grid; place-items: center; width: 2.1rem; height: 2.1rem; overflow: hidden;
+    border-radius: 9999px; font-size: .85rem; font-weight: 800; color: #fff;
+    background: linear-gradient(135deg, rgb(139 92 246 / .85), rgb(6 182 212 / .7));
+    border: 1px solid rgb(255 255 255 / .3); box-shadow: 0 4px 12px rgb(139 92 246 / .3);
+}
+.pm-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.pm-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+.pm-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8rem; font-weight: 700; color: rgb(255 255 255 / .9); }
+.pm-sub { display: flex; align-items: center; flex-wrap: wrap; gap: .25rem .45rem; font-size: .72rem; color: rgb(255 255 255 / .5); }
+.pm-sub svg { width: .85rem; height: .85rem; flex: none; }
+.pm-dot { opacity: .5; }
+
+/* نسخه‌ی بزرگ (صفحه‌ی پست و باکس نویسنده) */
+.pmeta-lg { gap: .85rem; }
+.pmeta-lg .pm-avatar { width: 3rem; height: 3rem; font-size: 1.1rem; }
+.pmeta-lg .pm-name { font-size: 1rem; }
+.pmeta-lg .pm-sub { font-size: .82rem; }
+
+/* اندازه‌ی آواتار در کامنت‌ها */
+.pm-avatar.is-md { width: 2.6rem; height: 2.6rem; }
+.pm-avatar.is-sm { width: 2rem; height: 2rem; font-size: .75rem; }

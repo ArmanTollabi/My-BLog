@@ -1,0 +1,160 @@
+/* سایدبار مشترک پنل‌ها (داشبورد کاربر + ادمین) — مارکاپ: views/panel/_sidebar.blade.php */
+/* ============ لینک (مشترک بین سایدبار دسکتاپ و sheet موبایل) ============ */
+.pnl-link {
+    position: relative; display: flex; align-items: center; gap: .75rem; white-space: nowrap; width: 100%;
+    padding: .75rem 1rem; border-radius: 1rem; font-size: .95rem; font-weight: 600; text-align: start;
+    color: rgb(244 241 255 / .68); background: transparent; border: 0; cursor: pointer;
+    font-family: inherit; text-decoration: none; transition: background .2s, color .2s;
+}
+.pnl-link svg { flex: none; width: 1.35rem; height: 1.35rem; }
+.pnl-text { flex: 1; }
+.pnl-link:hover { background: rgb(255 255 255 / .1); color: #fff; }
+.pnl-link:focus-visible { outline: 2px solid rgb(167 139 250 / .9); outline-offset: 2px; }
+.pnl-link.is-active {
+    color: #fff;
+    background: linear-gradient(270deg, rgb(139 92 246 / .42), rgb(6 182 212 / .14));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / .25), 0 6px 18px rgb(139 92 246 / .2);
+}
+.pnl-link.is-danger:hover { background: rgb(244 63 94 / .16); color: #fda4af; }
+.pnl-badge { border-radius: 9999px; padding: .125rem .5rem; font-size: .75rem; font-weight: 600; color: #fde68a; background: rgb(251 191 36 / .2); }
+.pnl-form { margin: 0; }
+.pnl-sep { height: 1px; margin: .6rem .75rem; background: rgb(255 255 255 / .1); }
+
+.pnl-name { font-size: .875rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pnl-role { margin-top: .125rem; font-size: .75rem; color: rgb(255 255 255 / .5); }
+.pnl-user { display: flex; align-items: center; gap: .75rem; padding: .75rem; border: 1px solid rgb(255 255 255 / .15);
+            border-radius: 1rem; background: rgb(255 255 255 / .05); }
+.pnl-user > div { min-width: 0; }
+
+/* ============ دسکتاپ: ستون بلند چسبیده به لبه‌ی راست ============ */
+.pnl { display: none; }
+@media (min-width: 1024px) {
+    .pnl { display: block; height: 100%; border-radius: 0;
+           border-start-end-radius: 2rem; border-end-end-radius: 2rem;      /* فقط گوشه‌های سمت محتوا گرد */
+           border-inline-start-width: 0; }
+    .pnl-inner { position: sticky; top: 1rem; padding: 1.25rem; }
+    .pnl-user { margin-bottom: 1.25rem; }
+    .pnl-label { margin-bottom: .5rem; padding-inline: .75rem; font-size: .75rem; font-weight: 600;
+                 letter-spacing: .02em; color: rgb(255 255 255 / .4); }
+    .pnl-tabs { display: flex; flex-direction: column; gap: .375rem; }
+    .pnl-sep { margin: .75rem; }
+
+    /* نوار رنگی کنار آیتم فعال، دقیقاً روی لبه‌ی راست سایدبار */
+    .pnl-link.is-active::before {
+        content: ''; position: absolute; inset-inline-start: -1.25rem; top: 18%; bottom: 18%; width: 4px;
+        border-radius: 9999px; background: linear-gradient(180deg, #a78bfa, #22d3ee);
+        box-shadow: 0 0 12px rgb(167 139 250 / .8);
+    }
+}
+
+/* ============ موبایل و تبلت: نوار پایین + sheet ============ */
+.pbar, .psheet, .psheet-ov { display: none; }
+
+@media (max-width: 1023.98px) {
+    /* جا برای نوار ثابت پایین (تا فوتر زیرش نرود) */
+    body:has(.pbar) { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom)); }
+
+    .pbar {
+        display: block; position: fixed; inset-inline: 0; bottom: 0; z-index: 80;
+        background: rgb(18 10 45 / .94);
+        -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%);
+        border-top: 1px solid rgb(255 255 255 / .18);
+        box-shadow: 0 -10px 30px rgb(0 0 0 / .4);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .pbar-in { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 36rem; margin-inline: auto; padding: .35rem .5rem; }
+    .pbar-item {
+        display: flex; flex-direction: column; align-items: center; gap: .2rem; min-width: 0; padding: .25rem 0;
+        font-family: inherit; font-size: .7rem; font-weight: 600; color: rgb(244 241 255 / .6);
+        background: none; border: 0; cursor: pointer; text-decoration: none; -webkit-tap-highlight-color: transparent;
+    }
+    .pbar-ic { position: relative; display: grid; place-items: center; width: 3.4rem; height: 2rem; border-radius: 9999px;
+               transition: background .25s, transform .15s; }
+    .pbar-ic svg { width: 1.4rem; height: 1.4rem; }
+    .pbar-item:active .pbar-ic { transform: scale(.9); }
+    .pbar-tx { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pbar-item.is-active { color: #fff; }
+    .pbar-item.is-active .pbar-ic {
+        background: linear-gradient(270deg, rgb(139 92 246 / .6), rgb(6 182 212 / .32));
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / .3), 0 4px 14px rgb(139 92 246 / .35);
+    }
+    .pbar-badge {
+        position: absolute; top: -.2rem; inset-inline-end: .25rem; display: grid; place-items: center;
+        min-width: 1.1rem; height: 1.1rem; padding: 0 .28rem; border-radius: 9999px; font-style: normal;
+        font-size: .65rem; font-weight: 800; color: #2a1405; background: #fbbf24; box-shadow: 0 0 0 2px rgb(18 10 45);
+    }
+
+    /* پس‌زمینه تار + sheet */
+    .psheet-ov { display: block; position: fixed; inset: 0; z-index: 100; background: rgb(8 4 24 / .6);
+                 -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+                 opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+    .psheet-ov.is-open { opacity: 1; pointer-events: auto; }
+
+    .psheet {
+        display: block; position: fixed; inset-inline: 0; bottom: 0; z-index: 101;
+        max-height: 82vh; overflow-y: auto; overscroll-behavior: contain;
+        padding: .6rem 1rem calc(1rem + env(safe-area-inset-bottom));
+        border-radius: 1.75rem 1.75rem 0 0; border: 1px solid rgb(255 255 255 / .2); border-bottom: 0;
+        background: linear-gradient(160deg, rgb(255 255 255 / .1), rgb(255 255 255 / .02)), rgb(22 12 54 / .97);
+        box-shadow: 0 -20px 60px rgb(0 0 0 / .55);
+        transform: translateY(105%); visibility: hidden;
+        transition: transform .35s cubic-bezier(.2, .8, .2, 1), visibility 0s .35s;
+    }
+    .psheet.is-open { transform: none; visibility: visible; transition: transform .35s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
+    .psheet-in { max-width: 32rem; margin-inline: auto; }
+    .psheet-grip { display: block; width: 2.6rem; height: .3rem; margin: 0 auto .9rem; border-radius: 9999px; background: rgb(255 255 255 / .25); }
+    .psheet .pnl-user { margin-bottom: .75rem; }
+    .psheet .pnl-link { min-height: 3rem; }      /* هدف لمسی راحت‌تر */
+    .psheet-title { margin: .25rem .75rem .35rem; font-size: .75rem; font-weight: 600; color: rgb(255 255 255 / .4); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .psheet, .psheet-ov, .pbar-ic { transition: none; }
+}
+
+/* ============ آیتم کشویی (زیرمنو) — فقط دسکتاپ ============ */
+.pnl-chevron { width: 1rem !important; height: 1rem !important; opacity: .7; transition: transform .25s; }
+.pnl-group.is-open > .pnl-link .pnl-chevron { transform: rotate(180deg); }
+.pnl-sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; }
+.pnl-group.is-open > .pnl-sub { grid-template-rows: 1fr; }
+.pnl-sub-in { min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: .15rem;
+              margin-inline-start: 1.6rem; padding-inline-start: .6rem; border-inline-start: 1px solid rgb(255 255 255 / .14); }
+.pnl-group.is-open > .pnl-sub > .pnl-sub-in { padding-block: .35rem; }
+.pnl-sublink { display: flex; align-items: center; gap: .6rem; padding: .45rem .8rem; border-radius: .75rem; font-size: .88rem; font-weight: 500;
+               color: rgb(244 241 255 / .62); text-decoration: none; transition: background .15s, color .15s; }
+.pnl-sublink:hover { background: rgb(255 255 255 / .08); color: #fff; }
+.pnl-sublink.is-active { color: #fff; font-weight: 700; background: rgb(139 92 246 / .22); }
+.pnl-sublink:focus-visible { outline: 2px solid rgb(167 139 250 / .9); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .pnl-sub, .pnl-chevron { transition: none; } }
+
+/* آیکن زیرمنو */
+.pnl-sublink svg { flex: none; width: 1.1rem; height: 1.1rem; opacity: .7; transition: opacity .15s, color .15s, transform .2s; }
+.pnl-sublink:hover svg { opacity: 1; transform: translateX(-1px); }
+.pnl-sublink.is-active svg { opacity: 1; color: #c4b5fd; }
+
+/* ============ قالب مشترک پنل‌ها — مارکاپ: views/panel/layout.blade.php ============
+   (قبلاً <style> داخل blade بود.)
+   موبایل و تبلت: تک‌ستونه؛ سایدبار دسکتاپ پنهان است و به‌جایش نوار پایین نمایش داده می‌شود */
+.panel-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; min-height: 70vh; padding-bottom: 1.5rem; }
+.panel-side  { min-width: 0; padding: 0; }
+.panel-main  { min-width: 0; padding: 1rem 1rem 0; }
+.panel-wrap  { max-width: 72rem; margin-inline: auto; }
+
+.panel-top   { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: 1.5rem; }
+.panel-top-text { min-width: 0; }
+.panel-hello { min-width: 0; font-size: 1.125rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.panel-date  { margin-top: .25rem; font-size: .875rem; color: rgb(255 255 255 / .5); }
+
+@media (min-width: 640px) {
+    .panel-main { padding-inline: 1.5rem; }
+    .panel-top { margin-bottom: 2rem; }
+    .panel-hello { font-size: 1.25rem; }
+}
+
+/* دسکتاپ: دو ستون؛ ستون اول (سایدبار) چون قاب RTL است سمت راست می‌افتد و تا آخر ارتفاع کشیده می‌شود */
+@media (min-width: 1024px) {
+    .panel-shell { grid-template-columns: 16.5rem minmax(0, 1fr); padding-bottom: 0; }
+    .panel-main  { padding: 2rem; }
+}
+@media (min-width: 1280px) {
+    .panel-shell { grid-template-columns: 18rem minmax(0, 1fr); }
+}

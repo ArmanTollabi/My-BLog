@@ -23,7 +23,10 @@ class UserPolicy
 
     public function delete_user(User $user,User $targetUser):bool{
 
-        return $user->role === 'admin' || $user->id === $targetUser->id  ;
+        // ادمین: همه به‌جز خودش | کاربر عادی: فقط خودش
+        return $user->isAdmin()
+            ? ! $user->is($targetUser)
+            : $user->is($targetUser);
     }
     /**
      * Determine whether the user can view any models.

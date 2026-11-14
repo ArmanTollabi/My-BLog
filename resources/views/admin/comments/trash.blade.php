@@ -7,9 +7,20 @@
 
     <section>
 
-        <div class="mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold gradient-text">سطل زباله‌ی کامنت‌ها</h1>
-            <p class="text-white/55 mt-2">کامنت‌های حذف‌شده را بازیابی کن یا برای همیشه از دیتابیس پاک کن</p>
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold gradient-text">سطل زباله‌ی کامنت‌ها</h1>
+                <p class="text-white/55 mt-2">کامنت‌های حذف‌شده را بازیابی کن یا برای همیشه از دیتابیس پاک کن</p>
+            </div>
+
+            {{-- خالی کردن کل سطل (مودال تایید: data-confirm؛ رفتار در confirm-modal.js) --}}
+            @if($counts['trash'] > 0)
+                <form action="{{ route('admin.comments.trash.empty') }}" method="POST"
+                      data-confirm="همه‌ی {{ \App\Support\Fa::number($counts['trash']) }} کامنت داخل سطل زباله (و ریپلای‌هایشان) برای همیشه حذف می‌شوند و قابل بازگشت نیست. ادامه می‌دهی؟">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="btn-delete">خالی کردن سطل زباله</button>
+                </form>
+            @endif
         </div>
 
         @include('admin.comments.tabs', ['counts' => $counts, 'active' => 'trash'])
@@ -43,8 +54,8 @@
                         </div>
 
                         <p class="text-sm text-white/55 mt-1">
-                            ثبت: {{ $comment->created_at->format('Y-m-d H:i') }}
-                            · حذف: {{ $comment->deleted_at->format('Y-m-d H:i') }}
+                            ثبت: {{ $comment->created_at_with_hours_fa}}
+                            · حذف: {{ $comment->deleted_at_with_hours_fa }}
                             · در پست
                             @if($comment->post)
                                 <a href="{{ route('posts.show', $comment->post) }}"
@@ -66,7 +77,7 @@
                     </form>
 
                     <form action="{{ route('admin.comments.force', $comment) }}" method="POST"
-                          onsubmit="return confirm('این کامنت (و ریپلای‌هایش) برای همیشه از دیتابیس حذف می‌شود. ادامه می‌دهی؟')">
+                          data-confirm="این کامنت (و ریپلای‌هایش) برای همیشه از دیتابیس حذف می‌شود. ادامه می‌دهی؟">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn-delete btn-sm">حذف همیشگی</button>
                     </form>

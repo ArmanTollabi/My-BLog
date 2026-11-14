@@ -1,0 +1,26 @@
+/* پاپ‌آپ «برای ادامه وارد شوید» — مارکاپ: views/posts/_login-modal.blade.php ، رفتار: resources/js/login-modal.js */
+.login-modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 1rem; }
+.login-modal[hidden] { display: none; }
+.login-modal-backdrop { position: absolute; inset: 0; background: rgb(8 4 24 / .65); backdrop-filter: blur(6px); animation: lm-fade .2s ease; }
+.login-modal-card {
+    position: relative; width: 100%; max-width: 26rem; padding: 2.25rem 1.75rem 1.75rem;
+    border-radius: 1.75rem; text-align: center; background: rgb(22 12 54 / .92);
+    box-shadow: 0 30px 80px rgb(0 0 0 / .6); animation: lm-pop .28s cubic-bezier(.2, .9, .3, 1.2);
+}
+.login-modal-close {
+    position: absolute; top: .9rem; inset-inline-end: .9rem; display: grid; place-items: center;
+    width: 2.2rem; height: 2.2rem; border-radius: 9999px; color: rgb(244 241 255 / .7);
+    background: rgb(255 255 255 / .08); transition: background .2s, color .2s;
+}
+.login-modal-close:hover { background: rgb(255 255 255 / .2); color: #fff; }
+.login-modal-icon {
+    display: grid; place-items: center; width: 4.5rem; height: 4.5rem; margin: 0 auto; border-radius: 1.4rem; color: #fff;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6); box-shadow: 0 12px 35px rgb(6 182 212 / .4);
+    animation: float-soft 4s ease-in-out infinite;
+}
+/* رنگ آیکن بسته به نوع عمل (data-kind را login-modal.js روی مودال می‌گذارد) */
+.login-modal[data-kind="like"] .login-modal-icon {
+    background: linear-gradient(135deg, #f43f5e, #8b5cf6); box-shadow: 0 12px 35px rgb(244 63 94 / .45);
+}
+@keyframes lm-fade { from { opacity: 0; } }
+@keyframes lm-pop { from { opacity: 0; transform: translateY(14px) scale(.94); } }

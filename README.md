@@ -1,301 +1,169 @@
-# My-BLog
+<div align="center">
 
-A Laravel-based blog application built with PHP, Laravel, and MySQL.
+# MyBlog
 
-## Features
+**وبلاگ فارسی با طراحی Glassmorphism، راست‌چین و تیره‌ی بنفش**
+ساخته‌شده با Laravel، Tailwind CSS و Vite
 
-- **Authentication:** User registration, login, and password reset.
-- **Post Management:** Create, view, edit, and manage blog posts.
-- **Categories and Tags:** Organize posts using categories and tags.
-- **Comments and Replies:** Comment on posts and participate in nested discussions.
-- **User Management:** Browse user profiles and manage users according to permissions.
-- **Admin Panel:** Manage posts and moderate comments through administrative interfaces.
-- **Notifications:** Notify users about relevant application activity.
-- **REST API:** API endpoints for posts, categories, tags, and users.
-- **Image Uploads:** Upload post images and user avatars.
-- **Search and Pagination:** Find content and navigate through paginated results.
-- **Authorization:** Policies and middleware for access control.
-- **Liking Posts System** : Like your favorite posts!
+![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
 
-## Tech Stack
+</div>
 
-- PHP
-- Laravel
-- MySQL
-- Blade
-- JavaScript
-- Vite
-- Tailwind CSS
+---
 
-## Requirements
+## معرفی
 
-Before installing the project, make sure you have:
+MyBlog یک سیستم وبلاگ کامل با رابط کاربری فارسی (RTL) است. نویسنده‌ها با ادیتور متن غنی مقاله می‌نویسند و منتشر یا زمان‌بندی می‌کنند. خواننده‌ها دیدگاه می‌گذارند و پست‌ها را نشان می‌کنند، و مدیر همه‌چیز را از پنل ادمین کنترل می‌کند. تاریخ‌ها در همه‌جا به‌صورت **شمسی (جلالی)** نمایش داده می‌شوند.
 
-- PHP compatible with the version specified in `composer.json`
-- Composer
-- Node.js and npm
-- A supported database, such as MySQL
-- Git
+## امکانات
 
-## Installation
+### مقاله‌ها
+- ادیتور متن غنی (Quill) با آپلود تصویر و ویرایش **متن جایگزین (alt)** برای هر تصویر
+- پاک‌سازی HTML ورودی (HtmlSanitizer) برای جلوگیری از XSS
+- **چرخه‌ی وضعیت پست:** پیش‌نویس، منتشرشده، زمان‌بندی‌شده و بایگانی‌شده
+- **انتشار خودکار** پست‌های زمان‌بندی‌شده با تقویم جلالی (انتخاب روز، ساعت و دقیقه)
+- slug فارسی یکتا که با ویرایش عنوان به‌روز می‌شود
+- دسته‌بندی و تگ، تصویر شاخص و شمارنده‌ی بازدید
+- **فهرست مطالب خودکار** (h1 تا h3) در سایدبار، با اسکرول نرم و هایلایت بخش جاری
+- نوار پیشرفت مطالعه، لینک دسته‌بندی‌ها در سایدبار و breadcrumb
+- SEO: عنوان و توضیحات meta، Open Graph، sitemap
 
-### 1. Clone the repository
+### کاربران و تعامل
+- ثبت‌نام، ورود و بازیابی رمز عبور
+- دیدگاه‌گذاری و پاسخ تودرتو
+- نشان‌کردن (Bookmark) پست‌ها
+- اعلان‌ها (Notification) با تاریخ و ساعت شمسی
+- پنل کاربری با پست‌های من و وضعیت هر پست
+
+### پنل ادمین
+- مدیریت پست‌ها با فیلتر وضعیت (همه، بایگانی، پیش‌نویس، منتشرشده، زمان‌بندی‌شده)
+- مدیریت دیدگاه‌ها: در انتظار تایید، تایید شده، سطل زباله و **خالی‌کردن سطل زباله**
+- مدیریت کاربران
+- سایدبار کشویی و جمع‌شونده
+
+### طراحی
+- Glassmorphism تیره‌ی بنفش، کاملاً RTL و واکنش‌گرا (Mobile-first)
+- بدون استفاده از Redis یا کش داده؛ کوئری‌ها مستقیم و با اسکوپ‌های Eloquent بهینه شده‌اند
+
+## پیش‌نیازها
+
+| ابزار | نسخه |
+|---|---|
+| PHP | ‎8.5 به بالا |
+| Composer | ‎2.x |
+| Node.js و npm | ‎20 به بالا |
+| MySQL | ‎8 به بالا (یا MariaDB معادل) |
+
+## نصب و راه‌اندازی
 
 ```bash
+# ۱) دریافت پروژه
 git clone https://github.com/ArmanTollabi/My-BLog.git
-cd My-BLog
-```
+cd REPO
 
-### 2. Install PHP dependencies
-
-```bash
+# ۲) وابستگی‌ها
 composer install
-```
+npm install
 
-### 3. Configure the environment
-
-```bash
+# ۳) تنظیمات محیطی
 cp .env.example .env
 php artisan key:generate
 ```
 
-On Windows PowerShell, use the following command instead of `cp` if needed:
+در فایل `.env` اطلاعات دیتابیس را وارد کن:
 
-```powershell
-Copy-Item .env.example .env
-```
-
-### 4. Configure the database
-
-Create a database in your database server, then update the database settings in `.env`.
-
-For a MySQL configuration, set the appropriate values for:
-
-```dotenv
+```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=your_database_name
-DB_USERNAME=your_database_username
-DB_PASSWORD=your_database_password
+DB_DATABASE=myblog
+DB_USERNAME=root
+DB_PASSWORD=
 ```
 
-Use your own database credentials. Never commit your real `.env` file.
+و در `config/app.php` مقدار زمان را روی تهران بگذار تا زمان‌بندی انتشار درست کار کند:
 
-### 5. Run database migrations
+```php
+'timezone' => 'Asia/Tehran',
+```
+
+سپس:
 
 ```bash
+# ۴) دیتابیس و لینک storage
 php artisan migrate
-```
-
-### 6. Install frontend dependencies
-
-```bash
-npm install
-npm run build
-```
-
-### 7. Create the public storage link
-
-```bash
 php artisan storage:link
-```
 
-### 8. Start the development server
-
-```bash
+# ۵) اجرا (دو ترمینال)
 php artisan serve
+npm run dev
 ```
 
-Open the local URL displayed in your terminal, usually `http://127.0.0.1:8000`.
+برای ساخت نسخه‌ی نهایی فرانت‌اند از `npm run build` استفاده کن.
 
-## API
+## انتشار خودکار پست‌های زمان‌بندی‌شده
 
-The project includes API routes for selected resources.
+دستور `posts:publish-scheduled` هر دقیقه اجرا می‌شود و پست‌هایی که زمانشان رسیده را منتشر می‌کند. پست زمان‌بندی‌شده حتی اگر scheduler اجرا نشود، به محض رسیدن زمانش برای بازدیدکنندگان قابل مشاهده است، ولی وضعیتش در دیتابیس فقط با اجرای scheduler به «منتشرشده» تغییر می‌کند.
 
-To inspect the available endpoints, run:
+**محیط توسعه (XAMPP یا لوکال):**
+```bash
+php artisan schedule:work
+```
+
+**سرور لینوکسی:** این خط را به cron اضافه کن:
+```cron
+* * * * * cd /path/to/project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+**ویندوز:** یک تسک در Task Scheduler بساز که هر دقیقه `php artisan schedule:run` را اجرا کند.
+
+## ساختار مهم پروژه
+
+```
+app/
+├── Console/Commands/PublishScheduledPosts.php   # انتشار خودکار
+├── Enums/PostStatus.php                         # وضعیت‌های پست
+├── Models/Concerns/                             # HasSlug و HasJalaliDates
+├── Services/PostService.php
+├── Support/                                     # JalaliDate، HtmlSanitizer
+resources/
+├── css/                                         # استایل هر صفحه (بدون CSS داخل blade)
+├── js/                                          # post-form، post-toc، panel و ...
+└── views/                                       # blade ها (بدون JS و کوئری داخل view)
+```
+
+قرارداد پروژه: هیچ CSS، JavaScript یا کوئری مستقیمی داخل فایل‌های blade نوشته نمی‌شود. استایل‌ها در `resources/css`، اسکریپت‌ها در `resources/js` و کوئری‌ها در کنترلرها، سرویس‌ها و اسکوپ‌های مدل هستند.
+
+## ساخت مدیر (Admin)
+
+بعد از ثبت‌نام یک کاربر، نقش او را با Tinker تغییر بده. نام ستون و مقدار نقش را مطابق ساختار جدول `users` خودت تنظیم کن:
 
 ```bash
-php artisan route:list --path=api
+php artisan tinker
+>>> \App\Models\User::where('email', 'you@example.com')->update(['role' => 'admin']);
 ```
 
-## Testing
-
-Run the automated test suite with:
+## تست و کیفیت کد
 
 ```bash
 php artisan test
+./vendor/bin/pint        # فرمت‌دهی کد (در صورت نصب بودن)
 ```
 
-## Performance Testing
+## نقشه‌ی راه
 
-A load-testing script is available at:
+- [ ] ریدایرکت ۳۰۱ از slug های قدیمی بعد از تغییر عنوان
+- [ ] جستجوی پیشرفته
+- [ ] خروجی RSS
 
-`performance-tests/posts-load-test.js`
+## مشارکت
 
-The script is intended for use with [k6](https://k6.io/). Install k6 and review the script configuration before running it against your local development server.
+Pull Request ها خوش‌آمدند. قبل از شروع یک Issue باز کن تا درباره‌ی تغییر گفتگو کنیم. لطفاً قرارداد «بدون CSS/JS/کوئری داخل blade» را رعایت کن.
 
-## Security
+## مجوز
 
-- Keep `.env` and all real credentials private.
-- Do not commit API keys, passwords, or other secrets.
-- Configure the application for production before deploying it publicly.
-
-## License
-
-No project-specific license has been declared yet.
-
--------------------------------------------------
-
----
-
----
-
-# مای‌بلاگ (My-BLog)
-
-یک سامانه وبلاگ‌نویسی توسعه‌یافته با استفاده از PHP و فریم‌ورک Laravel که امکاناتی برای مدیریت مطالب، دسته‌بندی‌ها، برچسب‌ها، کاربران و تعامل میان کاربران فراهم می‌کند.
-
-## امکانات پروژه
-
-- **احراز هویت کاربران:** ثبت‌نام، ورود و بازیابی رمز عبور.
-- **مدیریت مطالب:** ایجاد، مشاهده، ویرایش و مدیریت پست‌های وبلاگ.
-- **دسته‌بندی و برچسب‌ها:** سازمان‌دهی مطالب با استفاده از دسته‌بندی‌ها و تگ‌ها.
-- **نظرات و پاسخ‌های تو‌در‌تو:** ثبت نظر و ایجاد گفت‌وگوهای چندسطحی زیر مطالب.
-- **مدیریت کاربران:** مشاهده پروفایل کاربران و مدیریت آن‌ها بر اساس سطح دسترسی.
-- **پنل مدیریت:** مدیریت مطالب و بررسی و مدیریت نظرات.
-- **سیستم اعلان‌ها:** اطلاع‌رسانی درباره فعالیت‌های مرتبط در سامانه.
-- **رابط برنامه‌نویسی API:** ارائه مسیرهای API برای منابعی مانند پست‌ها، دسته‌بندی‌ها، تگ‌ها و کاربران.
-- **آپلود تصاویر:** امکان بارگذاری تصویر برای مطالب و آواتار کاربران.
-- **جست‌وجو و صفحه‌بندی:** جست‌وجوی محتوا و نمایش نتایج در صفحات جداگانه.
-- **کنترل دسترسی:** استفاده از Policyها و Middleware برای مدیریت مجوزهای کاربران.
-- **سیستم لایک پست** : لایک کردن پست ها در صورت دوست داشتن!
-
-## فناوری‌های استفاده‌شده
-
-- PHP
-- Laravel
-- MySQL
-- Blade
-- JavaScript
-- Vite
-- Tailwind CSS
-
-## پیش‌نیازهای نصب
-
-پیش از راه‌اندازی پروژه، موارد زیر را نصب کنید:
-
-- نسخه‌ای از PHP که با وابستگی‌های تعریف‌شده در `composer.json` سازگار باشد.
-- Composer برای مدیریت وابستگی‌های PHP.
-- Node.js و npm برای نصب و ساخت فایل‌های فرانت‌اند.
-- یک پایگاه داده پشتیبانی‌شده مانند MySQL.
-- Git برای دریافت کد پروژه.
-
-## راهنمای نصب و راه‌اندازی
-
-### ۱. دریافت پروژه
-
-```bash
-git clone https://github.com/ArmanTollabi/My-BLog.git
-cd My-BLog
-```
-
-### ۲. نصب وابستگی‌های PHP
-
-```bash
-composer install
-```
-
-### ۳. ایجاد و تنظیم فایل محیطی
-
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-در ویندوز و PowerShell می‌توانید به‌جای دستور `cp` از دستور زیر استفاده کنید:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-### ۴. تنظیم پایگاه داده
-
-ابتدا یک پایگاه داده در سرویس دیتابیس خود ایجاد کنید. سپس فایل `.env` را باز کرده و اطلاعات اتصال به دیتابیس را مطابق محیط خود تنظیم کنید.
-
-نمونه تنظیمات برای MySQL:
-
-```dotenv
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=your_database_name
-DB_USERNAME=your_database_username
-DB_PASSWORD=your_database_password
-```
-
-مقادیر نمونه را با اطلاعات واقعی محیط توسعه خود جایگزین کنید. فایل `.env` حاوی تنظیمات خصوصی است و نباید در مخزن عمومی GitHub منتشر شود.
-
-### ۵. اجرای Migrationها
-
-پس از تنظیم دیتابیس، جدول‌های موردنیاز پروژه را ایجاد کنید:
-
-```bash
-php artisan migrate
-```
-
-### ۶. نصب وابستگی‌های فرانت‌اند
-
-```bash
-npm install
-npm run build
-```
-
-### ۷. ایجاد لینک ذخیره‌سازی عمومی
-
-برای دسترسی به فایل‌هایی که در فضای ذخیره‌سازی عمومی Laravel قرار می‌گیرند، اجرا کنید:
-
-```bash
-php artisan storage:link
-```
-
-### ۸. اجرای پروژه
-
-```bash
-php artisan serve
-```
-
-پس از اجرای موفق دستور، آدرس نمایش‌داده‌شده در ترمینال را در مرورگر باز کنید. آدرس پیش‌فرض معمولاً `http://127.0.0.1:8000` است.
-
-## API
-
-پروژه شامل مسیرهای API برای برخی منابع سامانه است. برای مشاهده مسیرهای تعریف‌شده، دستور زیر را اجرا کنید:
-
-```bash
-php artisan route:list --path=api
-```
-
-## اجرای تست‌ها
-
-برای اجرای مجموعه تست‌های خودکار پروژه:
-
-```bash
-php artisan test
-```
-
-## تست عملکرد و بار
-
-اسکریپت تست بار پروژه در مسیر زیر قرار دارد:
-
-`performance-tests/posts-load-test.js`
-
-این اسکریپت برای استفاده با ابزار [k6](https://k6.io/) در نظر گرفته شده است. پیش از اجرا، k6 را نصب کرده و تنظیمات اسکریپت و آدرس سرور هدف را بررسی کنید.
-
-## نکات امنیتی
-
-- فایل `.env` و اطلاعات محرمانه اتصال به سرویس‌ها را خصوصی نگه دارید.
-- رمزهای عبور، API Keyها و سایر اطلاعات حساس را در مخزن عمومی قرار ندهید.
-- پیش از استقرار در محیط عملیاتی (Production)، تنظیمات امنیتی و پیکربندی مناسب آن محیط را انجام دهید.
-
-## مجوز استفاده
-
-در حال حاضر مجوز اختصاصی برای این پروژه اعلام نشده است.
+این پروژه تحت مجوز [MIT](LICENSE) منتشر شده است. اگر فایل `LICENSE` را نداری، یکی بساز یا این بخش را تغییر بده.

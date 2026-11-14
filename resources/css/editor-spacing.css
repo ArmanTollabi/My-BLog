@@ -1,0 +1,9 @@
+/* ادیتور باید فاصله‌ها را مثل صفحه‌ی پست (post-show.css) نشان دهد، تا شکل نهایی مقاله معلوم باشد.
+   ریشه‌ی اختلاف: پاراگراف خالی (Enter اضافه) + margin ها. اینجا همان مقادیر .ps-body را می‌دهیم. */
+.rte .ql-editor { line-height: 2.1; }
+.rte .ql-editor > * + * { margin-top: 1.25rem; }
+.rte .ql-editor h1, .rte .ql-editor h2, .rte .ql-editor h3 { margin-top: 2.5rem; }
+.rte .ql-editor h3 { margin-top: 2rem; }
+.rte .ql-editor > :first-child { margin-top: 0; }
+/* خط خالیِ تازه (تا لحظه‌ی ذخیره) فقط باریک نشان داده شود */
+.rte .ql-editor p:has(> br:only-child) { line-height: 1; margin-top: .4rem; }

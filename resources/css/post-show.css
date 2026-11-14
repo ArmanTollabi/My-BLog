@@ -1,0 +1,173 @@
+/* صفحه‌ی پست (مقاله) — مارکاپ: views/posts/show.blade.php
+   ترتیب صفحه: عنوان ← مسیر صفحه ← تصویر شاخص ← اطلاعات (نویسنده/زمان/بازدید) ← متن ← تگ و اکشن ← دیدگاه‌ها
+   موبایل-اول: پایه‌ی این فایل موبایل است؛ از md (768px) به بالا با @media برای دسکتاپ بزرگ می‌شود. */
+
+.ps { padding-block: 1rem 3rem; }
+.ps-wrap { width: 100%; max-width: 46rem; margin-inline: auto; padding-inline: 1rem; }
+@media (min-width: 640px) { .ps-wrap { padding-inline: 1.5rem; } }
+@media (min-width: 768px) { .ps-wrap { max-width: 50rem; } }
+@media (min-width: 1024px) { .ps-wrap { max-width: 72rem; } }      /* دسکتاپ: متن + ستون کناری */
+
+/* ---------- نوار پیشرفت مطالعه (زیر هدر چسبیده) ---------- */
+.ps-progress { position: fixed; inset-inline: 0; top: 0; z-index: 90; height: 3px; pointer-events: none; }
+.ps-progress > span {
+    display: block; height: 100%; transform: scaleX(0); transform-origin: right;      /* RTL: از راست پر می‌شود */
+    background: linear-gradient(90deg, #22d3ee, #a78bfa); box-shadow: 0 0 10px rgb(167 139 250 / .7);
+}
+
+/* ---------- عنوان + breadcrumb ---------- */
+/* عنوان و مسیر صفحه عمداً بدون هیچ پس‌زمینه/کادر/تاری‌اند (استایل‌های سراسری تگ‌ها خنثی می‌شوند) */
+.ps-head {
+    background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.ps-head { padding-top: .75rem; }
+.ps-title { font-size: clamp(1.65rem, 5.5vw, 2.8rem); font-weight: 800; line-height: 1.6; color: #fff; text-wrap: balance; }
+@media (min-width: 768px) { .ps-title { line-height: 1.55; } }
+
+.ps-head .crumbs { margin: .9rem 0 0; }
+@media (max-width: 639.98px) { .ps-head .crumbs-now { display: none; } }   /* موبایل: جا کم است، عنوان همان بالاست */
+
+/* ---------- تصویر شاخص: موبایل تمام‌عرض ۱۶:۱۰ | دسکتاپ پهن‌تر از متن ۱۶:۹ با سقف ارتفاع ---------- */
+.ps-cover { width: 100%; max-width: 62rem; margin: 1.25rem auto 0; }
+@media (min-width: 1024px) { .ps-cover { max-width: 72rem; } }
+.ps-cover img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; box-shadow: 0 20px 50px rgb(0 0 0 / .4); }
+@media (min-width: 640px) {
+    .ps-cover { padding-inline: 1.5rem; margin-top: 1.75rem; }
+    .ps-cover img { aspect-ratio: 16 / 9; max-height: 31rem; border-radius: 1.5rem; }
+}
+
+/* ---------- چیدمان: متن + ستون کناری ----------
+   موبایل/تبلت: تک‌ستونه با ترتیب  اطلاعات ← فهرست مطالب (جمع‌شده) ← متن ... ← دسته‌بندی‌ها
+   (.ps-side و .ps-main موقتاً display:contents‌اند تا فرزندهایشان با order جابه‌جا شوند)
+   دسکتاپ (lg+): ستون کناری ۱۷.۵rem سمت چپ (در RTL ستون دوم) و چسبان */
+.ps-layout { display: grid; grid-template-columns: minmax(0, 1fr); }
+.ps-side, .ps-main { display: contents; }
+.ps-layout [hidden] { display: none !important; }
+.ps-meta { order: -2; }
+.ps-toc { order: -1; margin-top: 1.25rem; }
+.ps-cats { order: 1; margin-top: 2.5rem; }
+
+@media (min-width: 1024px) {
+    .ps-layout { grid-template-columns: minmax(0, 1fr) 17.5rem; gap: 2rem; align-items: start; }
+    .ps-main { display: block; grid-column: 1; grid-row: 1; min-width: 0; }
+    .ps-side {
+        display: flex; flex-direction: column; gap: 1rem; grid-column: 2; grid-row: 1;
+        position: sticky; top: 5.5rem; max-height: calc(100vh - 6.5rem); overflow-y: auto; overscroll-behavior: contain;
+        scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / .25) transparent;
+    }
+    .ps-toc, .ps-cats { margin-top: 0; order: 0; }
+    .ps-side { margin-top: 1.75rem; }                 /* فاصله از تصویر شاخص؛ هم‌تراز با ردیف نویسنده */
+    .ps-meta { margin-top: 1.75rem; }
+    .ps-layout--solo { grid-template-columns: minmax(0, 1fr); }
+    .ps-layout--solo .ps-side { display: none; }
+}
+
+.ps-box { padding: 1rem 1.1rem; border-radius: 1.25rem; }
+.ps-box-title { display: flex; align-items: center; gap: .55rem; font-size: .95rem; font-weight: 800; color: #fff; }
+.ps-box-title svg { width: 1.15rem; height: 1.15rem; flex: none; color: #a5b4fc; }
+
+/* فهرست مطالب */
+.ps-toc > summary { list-style: none; cursor: pointer; user-select: none; }
+.ps-toc > summary::-webkit-details-marker { display: none; }
+.ps-toc > summary::after {
+    content: ''; margin-inline-start: auto; width: .5rem; height: .5rem; flex: none;
+    border-inline-end: 2px solid rgb(255 255 255 / .6); border-bottom: 2px solid rgb(255 255 255 / .6);
+    transform: rotate(45deg); transition: transform .2s;
+}
+.ps-toc[open] > summary::after { transform: rotate(-135deg); }
+.ps-toc-list, .ps-cats-list { list-style: none; padding: 0; }
+.ps-toc-list { margin-top: .75rem; border-inline-start: 1px solid rgb(255 255 255 / .12); }
+.ps-toc-list a {
+    display: block; margin-inline-start: -1px; padding: .4rem .75rem; border-inline-start: 2px solid transparent;
+    font-size: .88rem; line-height: 1.8; color: rgb(255 255 255 / .68); transition: color .15s, background .15s, border-color .15s;
+}
+.ps-toc-list a:hover { color: #fff; background: rgb(255 255 255 / .05); }
+.ps-toc-list a.is-active { color: #fff; font-weight: 700; border-inline-start-color: #a78bfa; background: rgb(139 92 246 / .16); }
+.ps-toc-l1 a { padding-inline-start: 1.5rem; }
+.ps-toc-l2 a { padding-inline-start: 2.25rem; font-size: .82rem; }
+
+/* دسته‌بندی‌ها */
+.ps-cats-list { display: flex; flex-direction: column; gap: .15rem; margin-top: .6rem; }
+.ps-cats-list a {
+    display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .65rem; border-radius: .75rem;
+    font-size: .9rem; color: rgb(255 255 255 / .75); transition: background .15s, color .15s;
+}
+.ps-cats-list a:hover { background: rgb(255 255 255 / .08); color: #fff; }
+.ps-cats-list a.is-current { background: rgb(139 92 246 / .22); color: #fff; font-weight: 700; }
+.ps-cats-count { min-width: 1.6rem; padding: .05rem .5rem; border-radius: 9999px; text-align: center; font-size: .72rem; background: rgb(255 255 255 / .1); color: rgb(255 255 255 / .65); }
+
+/* ---------- اطلاعات: موبایل دو ردیف | دسکتاپ یک ردیف (نویسنده راست، آمار چپ) ---------- */
+.ps-meta { display: flex; flex-direction: column; gap: .9rem; margin-top: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgb(255 255 255 / .12); }
+@media (min-width: 768px) { .ps-meta { flex-direction: row; align-items: center; justify-content: space-between; } }
+
+.ps-facts { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.ps-facts li {
+    display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .75rem; border-radius: 9999px;
+    font-size: .78rem; color: rgb(255 255 255 / .72); background: rgb(255 255 255 / .07); border: 1px solid rgb(255 255 255 / .12);
+}
+.ps-facts svg { width: 1rem; height: 1rem; flex: none; color: #a5b4fc; }
+
+/* ---------- متن مقاله (روی .rich-content پروژه سوار می‌شود) ---------- */
+.ps-body { margin-top: 1.75rem; font-size: 1.05rem; line-height: 2.1; color: rgb(244 241 255 / .9); }
+@media (min-width: 768px) { .ps-body { margin-top: 2.25rem; font-size: 1.15rem; line-height: 2.15; } }
+
+/* دسکتاپ: متن داخل کارت شیشه‌ای | موبایل: بدون کارت (کل عرض صفحه برای متن می‌ماند) */
+@media (min-width: 768px) {
+    .ps-body {
+        padding: 2.75rem 3rem; border-radius: 1.75rem;
+        background: linear-gradient(160deg, rgb(255 255 255 / .09), rgb(255 255 255 / .03));
+        border: 1px solid rgb(255 255 255 / .16); box-shadow: 0 20px 50px rgb(0 0 0 / .25);
+        -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    }
+}
+
+.ps-body.rich-content > * + * { margin-top: 1.25rem; }
+/* خط خالی ادیتور (<p><br></p> یا <p></p>) در انتشار نمایش داده نشود؛ فاصله‌ها فقط از margin ها می‌آید */
+.ps-body.rich-content p:empty,
+.ps-body.rich-content :is(p, h1, h2, h3):has(> br:only-child) { display: none; }
+.ps-body.rich-content p { text-align: justify; text-justify: inter-word; hyphens: auto; }
+@media (max-width: 639.98px) { .ps-body.rich-content p { text-align: start; } }      /* موبایل: justify باعث فاصله‌های زشت می‌شود */
+
+.ps-body.rich-content h1, .ps-body.rich-content h2, .ps-body.rich-content h3 { scroll-margin-top: 5.5rem; }   /* هدر چسبان روی عنوان نیفتد */
+.ps-body.rich-content h1, .ps-body.rich-content h2, .ps-body.rich-content h3 {
+    /* نوار بنفش همیشه سمت «راست» (صفحه RTL است). عمداً border-right/padding-right فیزیکی است نه inline-start:
+       هدینگ‌ها dir="auto" دارند و با متن انگلیسی LTR می‌شوند و inline-start می‌پرید سمت چپ. */
+    margin-top: 2.5rem; padding-right: .85rem; padding-left: 0; border-right: 4px solid #a78bfa; border-left: 0;
+    text-align: right;
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+}
+.ps-body.rich-content h1 { font-size: clamp(1.45rem, 4.4vw, 1.95rem); }
+.ps-body.rich-content h3 { margin-top: 2rem; font-size: clamp(1.15rem, 3.4vw, 1.4rem); border-right-width: 3px; }   /* همان نوار و رنگ h1/h2، کمی ظریف‌تر */
+.ps-body.rich-content blockquote {
+    margin-block: 1.75rem; padding: 1.1rem 1.25rem; border-radius: 1rem; font-size: 1.05em; color: rgb(255 255 255 / .85);
+    background: rgb(139 92 246 / .12); border-right: 4px solid #a78bfa; border-left: 0; text-align: right;   /* فیزیکی: مثل هدینگ‌ها، مستقل از dir="auto" */
+}
+.ps-body.rich-content li { margin-top: .35rem; }
+.ps-body.rich-content li::marker { color: #a78bfa; }
+.ps-body.rich-content img { margin-block: 1.75rem; box-shadow: 0 15px 40px rgb(0 0 0 / .35); }
+.ps-body.rich-content a { overflow-wrap: anywhere; }
+.ps-body.rich-content pre, .ps-body.rich-content table { max-width: 100%; overflow-x: auto; }
+.ps-body.rich-content table { display: block; }
+.ps-body.rich-content hr { margin-block: 2.25rem; }
+/* عکس‌های داخل متن در موبایل تمام‌عرض (پدینگ ستون را خنثی می‌کند) */
+@media (max-width: 639.98px) { .ps-body.rich-content img { width: calc(100% + 2rem); max-width: none; margin-inline: -1rem; border-radius: 0; border-inline: 0; } }
+
+/* ---------- تگ‌ها و اکشن‌ها ---------- */
+.ps-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 2.25rem; }
+.ps-tag {
+    padding: .35rem .85rem; border-radius: 9999px; font-size: .82rem; font-weight: 600; color: #ddd6fe;
+    background: rgb(255 255 255 / .08); border: 1px solid rgb(255 255 255 / .16); transition: background .2s, color .2s;
+}
+.ps-tag:hover { background: rgb(139 92 246 / .3); color: #fff; }
+
+.ps-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 1.75rem; padding: 1rem 1.1rem; border-radius: 1.25rem; }
+.ps-actions .ps-admin { margin-inline-start: auto; display: flex; align-items: center; gap: .6rem; }
+.ps-error { flex-basis: 100%; }
+
+/* ---------- دیدگاه‌ها ---------- */
+.ps-comments { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgb(255 255 255 / .12); }
+.ps-section-title { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.25rem; font-size: 1.4rem; font-weight: 800; color: #fff; }
+.ps-count { padding: .1rem .65rem; border-radius: 9999px; font-size: .8rem; background: rgb(255 255 255 / .1); color: rgb(255 255 255 / .75); }
+.ps-form { padding: 1.1rem; border-radius: 1.5rem; }
+.ps-form textarea { min-height: 7rem; resize: vertical; }
+.ps-login-hint { padding: 1.1rem 1.25rem; border-radius: 1.25rem; color: rgb(255 255 255 / .65); font-size: .95rem; }

@@ -1,49 +1,49 @@
 @extends('admin.layout')
 
-@section('title', 'Users')
+@section('title', 'کاربران')
 
 @section('admin-content')
 
-    <section class="max-w-5xl mx-auto px-6 py-12">
+    <section dir="rtl" class="max-w-5xl mx-auto px-6 py-12">
 
         {{-- جستجو و فیلتر (input / select / button مستقیماً داخل فرم، تا در یک ردیف قرار بگیرند) --}}
-        <form action="{{ route('users.index') }}" method="GET" class="mb-8">
+        <form action="{{ route('admin.users.index') }}" method="GET" class="mb-8">
 
             <input
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
-                placeholder="Search users..."
-                aria-label="Search users"
+                placeholder="جستجوی کاربران..."
+                aria-label="جستجوی کاربران"
                 class="glass-input"
             >
 
-            <select name="post_filter" aria-label="Filter by post count">
-                <option value="">Post count</option>
+            <select name="post_filter" aria-label="فیلتر بر اساس تعداد پست">
+                <option value="">تعداد پست</option>
 
                 <option value="most" {{ request('post_filter') === 'most' ? 'selected' : '' }}>
-                    Most posts
+                    بیشترین پست
                 </option>
 
                 <option value="least" {{ request('post_filter') === 'least' ? 'selected' : '' }}>
-                    Least posts
+                    کمترین پست
                 </option>
 
                 <option value="over_5" {{ request('post_filter') === 'over_5' ? 'selected' : '' }}>
-                    More than 5
+                    بیشتر از ۵
                 </option>
 
                 <option value="over_10" {{ request('post_filter') === 'over_10' ? 'selected' : '' }}>
-                    More than 10
+                    بیشتر از ۱۰
                 </option>
 
                 <option value="over_20" {{ request('post_filter') === 'over_20' ? 'selected' : '' }}>
-                    More than 20
+                    بیشتر از ۲۰
                 </option>
             </select>
 
             <button type="submit" class="btn-create">
-                Search
+                جستجو
             </button>
 
         </form>
@@ -79,7 +79,7 @@
                                 <p class="mt-2">
                                     <span class="inline-block rounded-full border border-white/15 bg-white/10
                                                  px-2.5 py-0.5 text-xs text-white/70">
-                                        Posts: {{ $user->posts_count }}
+                                        تعداد پست: {{ $user->posts_count }}
                                     </span>
                                 </p>
                             @endif
@@ -91,7 +91,7 @@
                     <div class="flex flex-wrap items-center gap-2">
 
                         @can('isAdmin', $user)
-                            <a href="{{ route('users.show', $user) }}" class="btn-glass btn-sm">
+                            <a href="{{ route('admin.users.show', $user) }}" class="btn-glass btn-sm">
                                 نمایش
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
                                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -102,7 +102,7 @@
                         @endcan
 
                         @can('update_user', $user)
-                            <a href="{{ route('users.edit', $user) }}" class="btn-edit btn-sm">
+                            <a href="{{ route('admin.users.edit', $user) }}" class="btn-edit btn-sm">
                                 ویرایش
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
                                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -113,9 +113,9 @@
                         @endcan
 
                         @can('delete_user', $user)
-                            <form action="{{ route('users.destroy', $user) }}"
+                            <form action="{{ route('admin.users.destroy', $user) }}"
                                   method="POST"
-                                  onsubmit="return confirm('مطمئنی می‌خوای این کاربر رو حذف کنی؟')">
+                                  data-confirm="مطمئنی می‌خوای این کاربر رو حذف کنی؟">
                                 @csrf
                                 @method('DELETE')
 
@@ -150,7 +150,7 @@
                         پیدا نشد.
                     </p>
 
-                    <a href="{{ route('users.index') }}" class="btn-glass btn-sm mt-5">
+                    <a href="{{ route('admin.users.index') }}" class="btn-glass btn-sm mt-5">
                         پاک کردن جستجو
                     </a>
                 </div>

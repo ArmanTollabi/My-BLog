@@ -1,0 +1,46 @@
+/* منوی هدر (قبلاً <style> داخل layouts/header.blade.php) */
+    /* منوی کاربر: به‌جای right:0 (فیزیکی) با inline-end به گروه دکمه‌ها می‌چسبد و هیچ‌وقت عریض‌تر از صفحه نمی‌شود */
+    #user-dropdown {
+        right: auto;
+        inset-inline-end: 0;
+        max-width: calc(100vw - 2rem);
+    }
+    #notification-dropdown { max-width: calc(100vw - 2rem); }
+
+    /* موبایل: کشوها به‌جای چسبیدن به دکمه، تمام عرض صفحه (با ۰٫۷۵rem حاشیه) و درست زیر گروه دکمه‌ها باز می‌شوند.
+       مقدار top را اسکریپت پایین هنگام باز شدن حساب می‌کند. */
+    @media (max-width: 639.98px) {
+        #user-dropdown,
+        #notification-dropdown {
+            position: fixed;
+            left: .75rem;
+            right: .75rem;
+            width: auto;
+            max-width: none;
+            margin: 0;
+            max-height: calc(100vh - 7rem);
+            overflow-y: auto;
+        }
+    }
+
+    /* منوی ناوبری: بدون پس‌زمینه‌ی ثابت؛ فقط روی هاور کمرنگ و برای صفحه‌ی فعال پررنگ‌تر */
+    nav.site-nav.site-nav { background: none !important; border: 0 !important; box-shadow: none !important;
+        -webkit-backdrop-filter: none !important; backdrop-filter: none !important; padding: 0; gap: .25rem; }
+    nav.site-nav .nav-link, nav.site-nav .nav-caret { background: transparent !important; border: 0 !important; box-shadow: none !important; }
+    nav.site-nav .nav-link, nav.site-nav .nav-dd { border-radius: 9999px; transition: background .2s, color .2s; }
+    nav.site-nav > .nav-link:hover, nav.site-nav .nav-dd:hover, nav.site-nav .nav-dd.is-open { background: rgb(255 255 255 / .08) !important; }
+    nav.site-nav > .nav-link.is-active, nav.site-nav .nav-dd.is-active {
+        background: rgb(139 92 246 / .28) !important; box-shadow: inset 0 0 0 1px rgb(167 139 250 / .35) !important; }
+    nav.site-nav .nav-dd.is-active .nav-link, nav.site-nav > .nav-link.is-active { color: #fff; }
+    @media (max-width: 767.98px) { nav.site-nav.site-nav { justify-content: center; } }
+
+/* موبایل: لوگو و دکمه‌ها در «یک» ردیف بمانند (بعد از اضافه شدن دکمه‌ی جستجو جا کم می‌آمد و دکمه‌ها به ردیف بعد می‌شکستند) */
+@media (max-width: 639.98px) {
+    .hdr-wrap { padding-inline: 1rem; }
+    .hdr-row { column-gap: .5rem; }
+    .hdr-actions { gap: .375rem; margin-inline-start: auto; }
+}
+/* گوشی‌های خیلی باریک (≤ ۳۸۰px): فقط آیکن لوگو، بدون نوشته‌ی MyBlog */
+@media (max-width: 379.98px) {
+    .hdr-row .brand-name { display: none; }
+}

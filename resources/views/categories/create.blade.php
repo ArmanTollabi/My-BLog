@@ -1,87 +1,41 @@
 @extends('layout')
 
-@section('title', 'Create Category')
+@section('title', 'ایجاد دسته‌بندی')
 
 @section('content')
 
     <div class="max-w-2xl mx-auto px-6 py-10">
 
-        <div class="mb-8">
+        <a href="{{ route('categories.index') }}" class="btn-glass">
+            <span aria-hidden="true">→</span> بازگشت به دسته‌بندی‌ها
+        </a>
 
-            <h1 class="text-3xl font-bold text-gray-900">
-                Create Category
-            </h1>
-
-            <p class="mt-2 text-gray-500">
-                Create a new category for your posts.
-            </p>
-
+        <div class="my-8">
+            <h1 class="text-3xl font-extrabold text-white">ایجاد دسته‌بندی</h1>
+            <p class="mt-2 text-white/60">یک دسته‌بندی تازه برای پست‌هایتان بسازید.</p>
         </div>
 
-
-        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-
-            <form
-                action="{{ route('categories.store') }}"
-                method="POST"
-            >
-
+        <div class="glass rounded-3xl p-6 md:p-8">
+            <form action="{{ route('categories.store') }}" method="POST">
                 @csrf
 
-                {{-- Category Name --}}
-                <div>
+                <label for="name" class="mb-2 block text-sm font-bold text-white/85">نام دسته‌بندی</label>
 
-                    <label
-                        for="name"
-                        class="block text-sm font-semibold text-gray-700 mb-2"
-                    >
-                        Category Name
-                    </label>
+                <input type="text" id="name" name="title" value="{{ old('title') }}" required
+                       placeholder="عنوان دسته‌بندی را بنویسید…"
+                       class="w-full rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white
+                              placeholder-white/40 outline-none transition
+                              focus:border-violet-300 focus:ring-4 focus:ring-violet-500/30">
 
-                    <input
-                        type="text"
-                        id="name"
-                        name="title"
-                        value="{{ old('title') }}"
-                        placeholder="Enter category title"
-                        class="w-full px-4 py-3
-                               border border-gray-300
-                               rounded-lg
-                               focus:outline-none
-                               focus:ring-2
-                               focus:ring-indigo-500
-                               focus:border-indigo-500"
-                    >
+                @error('title')
+                <p class="mt-2 text-sm text-rose-300">{{ $message }}</p>
+                @enderror
 
-                    @error('title')
-                    <p class="mt-2 text-sm text-red-600">
-                        {{ $message }}
-                    </p>
-                    @enderror
-
+                <div class="mt-8 flex items-center justify-end gap-3">
+                    <a href="{{ route('categories.index') }}" class="btn-cancel">انصراف</a>
+                    <button type="submit" class="btn-create">ایجاد</button>
                 </div>
-
-
-                {{-- Buttons --}}
-                <div class="flex items-center justify-end gap-3 mt-8">
-
-                    <a
-                        href="{{ route('categories.index') }}"
-                        class="btn-cancel">
-                        Cancel
-                    </a>
-
-                    <button
-                        type="submit"
-                        class="btn-create"
-                    >
-                        Create
-                    </button>
-
-                </div>
-
             </form>
-
         </div>
 
     </div>

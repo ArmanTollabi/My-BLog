@@ -1,0 +1,55 @@
+/* تم تیره‌ی شیشه‌ای برای تقویم جلالی (@majidh1/jalalidatepicker) — با متغیرهای خودِ پکیج.
+   select/input های داخل تقویم عمداً با !important و specificity بالا استایل می‌شوند تا استایل سراسری سایت
+   (مثل پدینگ، فلش و پس‌زمینه‌ی select ها) داخل تقویم نشت نکند. */
+jdp-container {
+    --jdp-color-0: #1b1040;                 /* پس‌زمینه */
+    --jdp-color-1: rgb(255 255 255 / .08);  /* هاور */
+    --jdp-color-2: rgb(255 255 255 / .16);  /* خط‌ها و سایه */
+    --jdp-color-3: rgb(255 255 255 / .35);
+    --jdp-color-4: rgb(255 255 255 / .55);
+    --jdp-color-5: #f4f1ff;                 /* متن */
+    --jdp-primary: #8b5cf6;
+    --jdp-red: #fb7185;
+    border: 1px solid rgb(255 255 255 / .2);
+    border-radius: 1rem;
+    box-shadow: 0 20px 50px rgb(0 0 0 / .55);
+    color: var(--jdp-color-5);
+    font-family: inherit;
+}
+
+/* ---------- انتخاب سال / ماه / ساعت / دقیقه ---------- */
+jdp-container .jdp-year, jdp-container .jdp-month, jdp-container .jdp-time { min-width: 0 !important; }
+
+jdp-container .jdp-year select, jdp-container .jdp-month select, jdp-container .jdp-time select,
+jdp-container .jdp-year input,  jdp-container .jdp-month input,  jdp-container .jdp-time input {
+    -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important;
+    box-sizing: border-box !important;
+    width: 100% !important; min-width: 0 !important; height: auto !important; min-height: 0 !important;
+    margin: 0 !important; padding: .3rem .4rem !important;
+    border: 0 !important; border-radius: .6rem !important; box-shadow: none !important;
+    background-color: #2b1d58 !important;      /* عمداً مات (نه rgba): لیست بازشونده‌ی مرورگر رنگش را از همین می‌گیرد */
+    background-image: none !important;
+    color: var(--jdp-color-5) !important; color-scheme: dark;
+    font: inherit !important; font-weight: 600 !important; text-align: center !important; line-height: 1.5 !important;
+}
+/* فلش سفارشی: فقط یک‌بار، سمت چپ (تقویم RTL است) */
+jdp-container .jdp-year select, jdp-container .jdp-month select, jdp-container .jdp-time select {
+    padding-left: 1.4rem !important; padding-right: .4rem !important;   /* فلش سمت چپ است */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4b5fd' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: left .4rem center !important;
+    background-size: .85rem !important;
+}
+jdp-container .jdp-year select:hover, jdp-container .jdp-month select:hover, jdp-container .jdp-time select:hover { background-color: #38276f !important; filter: none !important; }
+jdp-container .jdp-year select:focus-visible, jdp-container .jdp-month select:focus-visible, jdp-container .jdp-time select:focus-visible { outline: 2px solid #a78bfa !important; outline-offset: 1px; }
+/* گزینه‌های لیست بازشونده (سال، ماه، ساعت، دقیقه) */
+jdp-container .jdp-year select option, jdp-container .jdp-month select option, jdp-container .jdp-time select option {
+    background-color: #1b1040 !important; color: #f4f1ff !important; padding: .3rem .5rem !important;
+}
+jdp-container .jdp-year select option:checked, jdp-container .jdp-month select option:checked, jdp-container .jdp-time select option:checked,
+jdp-container .jdp-year select option:hover,   jdp-container .jdp-month select option:hover,   jdp-container .jdp-time select option:hover {
+    background: linear-gradient(#7c5ce0, #7c5ce0) !important; background-color: #7c5ce0 !important; color: #fff !important;
+}
+
+/* ---------- دکمه‌ها ---------- */
+jdp-container .jdp-btn-today, jdp-container .jdp-btn-empty, jdp-container .jdp-btn-close { color: #fff; }

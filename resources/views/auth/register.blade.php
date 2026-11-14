@@ -21,8 +21,8 @@
                 <p class="mt-2 text-white/60">در چند ثانیه حساب خود را بسازید.</p>
             </div>
 
-            <form id="register-form" action="{{ route('register') }}" method="POST"
-                  class="glass rounded-3xl p-8 sm:p-10 space-y-6" novalidate>
+            <form id="register-form" data-submit-lock data-loading-text="در حال ساخت حساب…" action="{{ route('register') }}" method="POST"
+                  class="glass rounded-3xl p-8 sm:p-10 space-y-6">
                 @csrf
 
                 {{-- نام --}}
@@ -94,7 +94,7 @@
                             </svg>
                         </span>
 
-                        <input type="password" id="password" name="password"
+                        <input type="password" id="password" name="password" data-password
                                dir="ltr" autocomplete="new-password" required
                                placeholder="••••••••"
                                aria-describedby="password-hint{{ $errors->has('password') ? ' password-error' : '' }}"
@@ -118,15 +118,15 @@
 
                     {{-- نوار قدرت رمز --}}
                     <div class="mt-3" aria-live="polite">
-                        <div class="flex gap-1.5" id="strength-bars">
+                        <div class="flex gap-1.5" data-strength-bars>
                             <span class="h-1.5 flex-1 rounded-full bg-white/15 transition-colors"></span>
                             <span class="h-1.5 flex-1 rounded-full bg-white/15 transition-colors"></span>
                             <span class="h-1.5 flex-1 rounded-full bg-white/15 transition-colors"></span>
                             <span class="h-1.5 flex-1 rounded-full bg-white/15 transition-colors"></span>
                         </div>
                         <p id="password-hint" class="mt-2 text-xs text-white/50">
-                            حداقل ۸ کاراکتر؛ ترکیب حروف، عدد و نماد رمز را قوی‌تر می‌کند.
-                            <span id="strength-label" class="font-bold"></span>
+                            حداقل 6 کاراکتر؛ ترکیب حروف، عدد و نماد رمز را قوی‌تر می‌کند.
+                            <span data-strength-label class="font-bold"></span>
                         </p>
                     </div>
 
@@ -151,7 +151,7 @@
                             </svg>
                         </span>
 
-                        <input type="password" id="password_confirmation" name="password_confirmation"
+                        <input type="password" id="password_confirmation" name="password_confirmation" data-password-confirm
                                dir="ltr" autocomplete="new-password" required
                                placeholder="••••••••"
                                aria-describedby="match-message"
@@ -171,17 +171,17 @@
                         </button>
                     </div>
 
-                    <p id="match-message" class="mt-2 text-xs min-h-4" aria-live="polite"></p>
+                    <p data-match-message class="mt-2 text-xs min-h-4" aria-live="polite"></p>
                 </div>
 
                 {{-- دکمه ثبت‌نام --}}
-                <button type="submit" id="register-btn"
+                <button type="submit" data-submit-btn
                         class="glass-btn-primary w-full justify-center py-3.5 text-base disabled:opacity-70 disabled:cursor-wait">
-                    <svg id="register-spinner" class="hidden w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg data-spinner class="hidden w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                     </svg>
-                    <span id="register-label">ثبت‌نام</span>
+                    <span data-label>ثبت‌نام</span>
                 </button>
 
                 {{-- ورود --}}
@@ -196,101 +196,5 @@
 
         </div>
     </div>
-
-    <script>
-        (function () {
-            const pwd = document.getElementById('password');
-            const confirmInput = document.getElementById('password_confirmation');
-            const bars = document.querySelectorAll('#strength-bars span');
-            const strengthLabel = document.getElementById('strength-label');
-            const matchMsg = document.getElementById('match-message');
-            const form = document.getElementById('register-form');
-            const btn = document.getElementById('register-btn');
-            const spinner = document.getElementById('register-spinner');
-            const label = document.getElementById('register-label');
-
-            // نمایش / مخفی کردن رمز (برای هر دو فیلد)
-            document.querySelectorAll('[data-toggle-password]').forEach(function (toggle) {
-                const input = document.getElementById(toggle.dataset.togglePassword);
-                const open = toggle.querySelector('[data-eye-open]');
-                const closed = toggle.querySelector('[data-eye-closed]');
-
-                toggle.addEventListener('click', function () {
-                    const show = input.type === 'password';
-                    input.type = show ? 'text' : 'password';
-                    open.classList.toggle('hidden', show);
-                    closed.classList.toggle('hidden', !show);
-                    toggle.setAttribute('aria-pressed', show ? 'true' : 'false');
-                    input.focus();
-                });
-            });
-
-            // قدرت رمز عبور
-            const levels = [
-                {text: 'ضعیف',  bar: 'bg-rose-400',    txt: 'text-rose-300'},
-                {text: 'متوسط', bar: 'bg-amber-400',   txt: 'text-amber-300'},
-                {text: 'خوب',   bar: 'bg-sky-400',     txt: 'text-sky-300'},
-                {text: 'قوی',   bar: 'bg-emerald-400', txt: 'text-emerald-300'}
-            ];
-            const allBar = levels.map(l => l.bar).concat('bg-white/15');
-            const allTxt = levels.map(l => l.txt);
-
-            function score(v) {
-                if (!v) return 0;
-                let s = 0;
-                if (v.length >= 8) s++;
-                if (/[a-z]/.test(v) && /[A-Z]/.test(v)) s++;
-                if (/\d/.test(v)) s++;
-                if (/[^A-Za-z0-9]/.test(v)) s++;
-                if (v.length < 6) s = Math.min(s, 1);
-                return Math.max(s, 1);
-            }
-
-            function updateStrength() {
-                const v = pwd.value;
-                const s = v ? score(v) : 0;
-                const level = levels[s - 1];
-
-                bars.forEach(function (bar, i) {
-                    bar.classList.remove.apply(bar.classList, allBar);
-                    bar.classList.add(i < s ? level.bar : 'bg-white/15');
-                });
-
-                strengthLabel.classList.remove.apply(strengthLabel.classList, allTxt);
-                strengthLabel.textContent = s ? '— ' + level.text : '';
-                if (s) strengthLabel.classList.add(level.txt);
-            }
-
-            // تطابق رمز و تکرار آن
-            function updateMatch() {
-                matchMsg.classList.remove('text-emerald-300', 'text-rose-300');
-                if (!confirmInput.value) { matchMsg.textContent = ''; return; }
-
-                if (confirmInput.value === pwd.value) {
-                    matchMsg.textContent = '✓ رمزها یکسان هستند.';
-                    matchMsg.classList.add('text-emerald-300');
-                } else {
-                    matchMsg.textContent = 'رمزها یکسان نیستند.';
-                    matchMsg.classList.add('text-rose-300');
-                }
-            }
-
-            pwd.addEventListener('input', function () { updateStrength(); updateMatch(); });
-            confirmInput.addEventListener('input', updateMatch);
-
-            // جلوگیری از ارسال دوباره
-            form.addEventListener('submit', function () {
-                btn.disabled = true;
-                spinner.classList.remove('hidden');
-                label.textContent = 'در حال ساخت حساب…';
-            });
-
-            window.addEventListener('pageshow', function () {
-                btn.disabled = false;
-                spinner.classList.add('hidden');
-                label.textContent = 'ثبت‌نام';
-            });
-        })();
-    </script>
 
 @endsection

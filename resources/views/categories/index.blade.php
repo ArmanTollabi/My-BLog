@@ -1,27 +1,32 @@
 @extends('layout')
 
-@section('title', 'Categories')
+@section('title', 'دسته‌بندی‌ها')
 
 @section('content')
 
     <div class="max-w-5xl mx-auto px-6 py-10">
+
+        <x-breadcrumbs :items="[
+            ['label' => 'خانه', 'url' => route('home')],
+            ['label' => 'دسته‌بندی‌ها'],
+        ]" />
 
         {{-- Header --}}
         <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
 
             <div>
                 <h1 class="text-3xl font-extrabold text-white">
-                    Categories
+                    دسته‌بندی‌ها
                 </h1>
 
                 <p class="mt-2 text-white/60">
-                    post categories.
+                    دسته‌بندی پست‌های وبلاگ.
                 </p>
             </div>
             @can('create_cat',App\Models\Category::class)
 
             <a href="{{ route('categories.create') }}" class="glass-btn-primary">
-                + Create Category
+                + ایجاد دسته‌بندی
             </a>
           @endcan
 
@@ -46,7 +51,7 @@
                                     text-lg font-bold text-white
                                     border border-white/25
                                     bg-gradient-to-br from-violet-500/60 to-cyan-500/40">
-                            {{ strtoupper(mb_substr($category->title, 0, 1)) }}
+                            {{ mb_strtoupper(mb_substr($category->title, 0, 1)) }}
                         </div>
 
                         <div>
@@ -57,8 +62,8 @@
                             <p class="mt-1">
                                 <span class="inline-block px-2.5 py-0.5 rounded-full text-xs
                                              bg-white/10 border border-white/15 text-white/70">
-                                    {{ $category->posts_count ?? $category->posts()->count() }}
-                                    posts
+                                    {{ $category->posts_count }}
+                                    پست
                                 </span>
                             </p>
                         </div>
@@ -72,15 +77,15 @@
                                    border border-transparent
                                    hover:bg-violet-500/20 hover:border-violet-300/30 transition"
                         >
-                            Show Posts
+                            مشاهده‌ی پست‌ها
                         </a>
 
                         {{-- Delete --}}
-                        @can('isAdmin',$user)
+                        @can('delete_cat', $category)
                         <form
                             action="{{ route('categories.destroy', $category) }}"
                             method="POST"
-                            onsubmit="return confirm('Are you sure you want to delete this category?')"
+                            data-confirm="مطمئنی می‌خوای این دسته‌بندی رو حذف کنی؟"
                         >
                             @csrf
                             @method('DELETE')
@@ -91,7 +96,7 @@
                                        border border-transparent
                                        hover:bg-rose-500/20 hover:border-rose-300/30 transition"
                             >
-                                Delete
+                                حذف
                             </button>
                         </form>
                         @endcan
@@ -102,16 +107,16 @@
                 <div class="px-6 py-12 text-center">
 
                     <p class="text-white/60">
-                        No categories have been created yet.
+                        هنوز هیچ دسته‌بندی‌ای ساخته نشده است.
                     </p>
 
-                    @can('isAdmin',App\Models\User::class)
+                    @can('create_cat', App\Models\Category::class)
                         <a
                             href="{{ route('categories.create') }}"
                             class="inline-block mt-4 font-semibold
                                text-violet-300 hover:text-violet-200 transition"
                         >
-                            Create your first category
+                            اولین دسته‌بندی را بسازید
                         </a>
                     @endcan
 

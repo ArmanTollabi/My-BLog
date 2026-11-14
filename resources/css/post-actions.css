@@ -1,0 +1,23 @@
+/* دکمه‌های لایک / ذخیره (صفحه‌ی پست) — رفتار: resources/js/post-actions.js */
+.like-btn {
+    display: inline-flex; align-items: center; gap: .55rem;
+    padding: .5rem 1.1rem; border-radius: 9999px; cursor: pointer;
+    color: rgb(244 241 255 / .75);
+    background: rgb(255 255 255 / .08);
+    border: 1px solid rgb(255 255 255 / .22);
+    transition: background .2s, color .2s, border-color .2s, transform .2s;
+}
+.like-btn:hover { background: rgb(255 255 255 / .16); color: #fff; transform: translateY(-1px); }
+.like-btn:disabled { opacity: .7; cursor: progress; }
+.like-btn:focus-visible { outline: 2px solid rgb(167 139 250 / .9); outline-offset: 3px; }
+.like-heart { width: 1.4rem; height: 1.4rem; fill: none; transition: fill .2s, transform .2s; }
+.like-count { font-weight: 700; min-width: 1ch; font-variant-numeric: tabular-nums; }
+.like-btn.is-liked { color: #fb7185; background: rgb(244 63 94 / .14); border-color: rgb(244 63 94 / .45); }
+.like-btn.is-liked .like-heart { fill: currentColor; }
+.like-btn.pop .like-heart { animation: like-pop .45s cubic-bezier(.2, .9, .3, 1.6); }
+.like-btn.is-saved { color: #22d3ee; background: rgb(6 182 212 / .14); border-color: rgb(6 182 212 / .45); }
+.like-btn.is-saved .save-icon { fill: currentColor; }
+.like-btn:disabled .like-heart { animation: btn-busy .8s ease-in-out infinite; }
+
+@keyframes like-pop { 0% { transform: scale(1); } 40% { transform: scale(1.45); } 100% { transform: scale(1); } }
+@keyframes btn-busy { 50% { transform: scale(.82); opacity: .5; } }

@@ -1,0 +1,11 @@
+/* مسیر صفحه (breadcrumb) — مارکاپ: views/components/breadcrumbs.blade.php.
+   عمداً بدون پس‌زمینه/کادر؛ استایل‌های سراسری تگ nav خنثی می‌شوند. */
+.crumbs { margin-bottom: 1.25rem; background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.crumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: .15rem .5rem; font-size: .8rem; color: rgb(255 255 255 / .5); }
+.crumbs li { display: inline-flex; align-items: center; gap: .5rem; min-width: 0; }
+.crumbs li + li::before { content: '‹'; opacity: .45; }                       /* در RTL یعنی «بعدی» */
+.crumbs a { color: rgb(244 241 255 / .72); transition: color .2s; }
+.crumbs a:hover { color: #fff; }
+.crumbs-now { color: rgb(255 255 255 / .45); }
+.crumbs-now span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 14rem; }
+@media (min-width: 768px) { .crumbs-now span { max-width: 26rem; } }

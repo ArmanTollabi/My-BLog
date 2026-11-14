@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CommentStatus;
+use App\Services\ImageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,32 +17,76 @@ class DashboardController extends Controller
     // دیسکی که عکس‌های دیگر سایت (مثل عکس پست‌ها) روی آن ذخیره می‌شوند
     private const DISK = 'public';
 
+    // ───────────── صفحه‌های داشبورد (هرکدام فقط کوئری‌های خودش را می‌زند) ─────────────
+
+    // اطلاعات حساب: نام/ایمیل، آواتار، رمز عبور
     public function index(Request $request): View
     {
         $user = $request->user();
 
-        $hasPosts = method_exists($user, 'posts');
-        $posts = $hasPosts ? $user->posts()->latest()->take(5)->get() : collect();
+        // یک کوئری برای هر سه شمارنده
+        $user->loadCount([
+            'posts',
+            'comments as approved_comments_count' => fn ($q) => $q->where('status', CommentStatus::Approved->value),
+            'savedPosts' => fn ($q) => $q->published(),   // بوکمارکِ پستی که بعداً پیش‌نویس/بایگانی شده نشمرده شود
+        ]);
 
-        // شمارش کامنت‌ها بر اساس وضعیت: ['approved' => 3, 'pending' => 1]
+        return view('dashboard.index', compact('user'));
+    }
+
+    // کامنت‌های کاربر
+    public function comments(Request $request): View
+    {
+        $user = $request->user();
+
+        // شمارش بر اساس وضعیت: ['approved' => 3, 'pending' => 1]
         $commentCounts = $user->comments()
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        // کامنت‌های خود کاربر، صفحه‌بندی‌شده (۵ تا در هر صفحه) با پست مربوطه
         $comments = $user->comments()
-            ->with('post:id,title')
+            ->with('post:id,title,slug')
             ->latest()
-            ->paginate(5, ['*'], 'comments_page')
-            ->fragment('my-comments');
+            ->paginate(6)
+            ->withQueryString();
 
-        $stats = [
-            'posts'    => $hasPosts ? $user->posts()->count() : 0,
-            'comments' => $commentCounts['approved'] ?? 0,
-        ];
+        return view('dashboard.comments', compact('user', 'comments', 'commentCounts'));
+    }
 
-        return view('dashboard', compact('user', 'posts', 'stats', 'comments', 'commentCounts'));
+    // پست‌های کاربر
+    public function posts(Request $request): View
+    {
+        $user = $request->user();
+
+        // پست‌های خودِ کاربر با «همه‌ی وضعیت‌ها» (پیش‌نویس، زمان‌بندی‌شده، بایگانی هم) — کارت نشانک وضعیت دارد
+        $posts = $user->posts()
+            ->listColumns()
+            ->with('category:id,title,slug')
+            ->withCount('likes')
+            ->latest()
+            ->paginate(6)
+            ->withQueryString();
+
+        return view('dashboard.posts', compact('user', 'posts'));
+    }
+
+    // پست‌های بوکمارک‌شده
+    public function bookmarks(Request $request): View
+    {
+        $user = $request->user();
+
+        // فقط پست‌هایی که الان منتشر شده‌اند
+        $posts = $user->savedPosts()
+            ->published()
+            ->listColumns()
+            ->with('category:id,title,slug')
+            ->withCount('likes')
+            ->latest('posts.created_at')
+            ->paginate(6)
+            ->withQueryString();
+
+        return view('dashboard.bookmarks', compact('user', 'posts'));
     }
 
     // تغییر نام و ایمیل
@@ -60,7 +106,7 @@ class DashboardController extends Controller
     }
 
     // انتخاب / تغییر عکس پروفایل (با AJAX → JSON، بدون JS → ریدایرکت معمولی)
-    public function updateAvatar(Request $request): RedirectResponse|JsonResponse
+    public function updateAvatar(Request $request, ImageService $images): RedirectResponse|JsonResponse
     {
         // در حالت AJAX خطای اعتبارسنجی به‌صورت JSON با کد ۴۲۲ برمی‌گردد
         $request->validate([
@@ -69,7 +115,7 @@ class DashboardController extends Controller
 
         $user = $request->user();
 
-        $path = $request->file('avatar')->store('avatars', self::DISK);
+        $path = $images->storeAvatar($request->file('avatar'), 'avatars');   // مربع ۲۵۶px، webp
 
         // عکس قبلی پاک شود تا فایل بی‌استفاده روی سرور نماند
         if ($user->avatar) {

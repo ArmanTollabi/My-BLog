@@ -4,10 +4,10 @@
     $type = in_array($type, ['success', 'error', 'warning', 'info']) ? $type : 'info';
 
     $titles = [
-        'success' => 'Success!',
-        'error'   => 'Error!',
-        'warning' => 'Warning!',
-        'info'    => 'Info',
+        'success' => 'موفق,',
+        'error'   =>'خطا',
+        'warning' => 'هشدار',
+        'info'    => 'جهت اطلاع',
     ];
 
     // پیام‌های موفقیت و اطلاعات خودکار محو می‌شوند؛ خطا و هشدار می‌مانند تا دیده شوند

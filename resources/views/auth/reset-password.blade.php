@@ -1,6 +1,6 @@
 @extends('layout')
 
-@section('title', 'Reset Password')
+@section('title', 'بازیابی رمز عبور')
 
 @section('content')
 
@@ -20,16 +20,16 @@
                 </div>
 
                 <h1 class="text-3xl font-extrabold text-white">
-                    Reset your password
+                    بازیابی رمز عبور
                 </h1>
 
                 <p class="mt-2 text-white/60">
-                    Enter your new password below.
+                    رمز عبور جدید رو وارد کن
                 </p>
 
             </div>
 
-            <form id="reset-form" action="{{ route('password.update') }}" method="POST"
+            <form id="reset-form" data-submit-lock data-loading-text="در حال ذخیره…" action="{{ route('password.update') }}" method="POST"
                   class="glass rounded-3xl p-8 sm:p-10 space-y-6" novalidate>
 
                 @csrf
@@ -39,7 +39,7 @@
                 {{-- Email --}}
                 <div>
                     <label for="email" class="block text-sm font-bold mb-2 text-white">
-                        Email address
+                        ایمیل
                     </label>
 
                     <div class="relative">
@@ -72,7 +72,7 @@
                 {{-- New password --}}
                 <div>
                     <label for="password" class="block text-sm font-bold mb-2 text-white">
-                        New password
+                        رمز عبور جدید
                     </label>
 
                     <div class="relative">
@@ -82,9 +82,9 @@
                             </svg>
                         </span>
 
-                        <input type="password" id="password" name="password"
+                        <input type="password" id="password" name="password" data-password
                                dir="ltr" required autocomplete="new-password" autofocus
-                               placeholder="Enter your new password"
+                               placeholder="رمز عبور جدیدت رو وارد کن"
                                aria-describedby="password-hint{{ $errors->has('password') ? ' password-error' : '' }}"
                                @error('password') aria-invalid="true" @enderror
                                class="glass-input pl-12 pr-12 text-left
@@ -106,15 +106,15 @@
 
                     {{-- نوار قدرت رمز --}}
                     <div class="mt-3" aria-live="polite">
-                        <div class="flex gap-1.5" id="strength-bars">
+                        <div class="flex gap-1.5" data-strength-bars>
                             <span class="h-1.5 flex-1 rounded-full bg-white/15 transition-colors"></span>
                             <span class="h-1.5 flex-1 rounded-full bg-white/15 transition-colors"></span>
                             <span class="h-1.5 flex-1 rounded-full bg-white/15 transition-colors"></span>
                             <span class="h-1.5 flex-1 rounded-full bg-white/15 transition-colors"></span>
                         </div>
                         <p id="password-hint" class="mt-2 text-xs text-white/50">
-                            At least 8 characters; mix letters, numbers and symbols for a stronger password.
-                            <span id="strength-label" class="font-bold"></span>
+                            حداقل ۸ کاراکتر؛ ترکیب حروف، عدد و نماد رمز را قوی‌تر می‌کند.
+                            <span data-strength-label class="font-bold"></span>
                         </p>
                     </div>
 
@@ -131,7 +131,7 @@
                 {{-- Confirm password --}}
                 <div>
                     <label for="password_confirmation" class="block text-sm font-bold mb-2 text-white">
-                        Confirm new password
+                        تکرار رمز عبور
                     </label>
 
                     <div class="relative">
@@ -141,9 +141,9 @@
                             </svg>
                         </span>
 
-                        <input type="password" id="password_confirmation" name="password_confirmation"
+                        <input type="password" id="password_confirmation" name="password_confirmation" data-password-confirm
                                dir="ltr" required autocomplete="new-password"
-                               placeholder="Confirm your new password"
+                               placeholder="تکرار رمز عبور"
                                aria-describedby="match-message"
                                class="glass-input pl-12 pr-12 text-left">
 
@@ -161,24 +161,24 @@
                         </button>
                     </div>
 
-                    <p id="match-message" class="mt-2 text-xs min-h-4" aria-live="polite"></p>
+                    <p data-match-message class="mt-2 text-xs min-h-4" aria-live="polite"></p>
                 </div>
 
                 {{-- Submit --}}
-                <button type="submit" id="reset-btn"
+                <button type="submit" data-submit-btn
                         class="glass-btn-primary w-full justify-center py-3.5 text-base disabled:opacity-70 disabled:cursor-wait">
-                    <svg id="reset-spinner" class="hidden w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg data-spinner class="hidden w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                     </svg>
-                    <span id="reset-label">Reset Password</span>
+                    <span data-label>تایید رمز عبور جدید</span>
                 </button>
 
                 {{-- Back to login --}}
                 <div class="pt-5 border-t border-white/10 text-center">
                     <a href="{{ route('login') }}"
                        class="text-sm font-medium text-violet-300 hover:text-violet-200 transition">
-                        ← Back to Login
+                        ← برگشت به صفحه ی ورود
                     </a>
                 </div>
 
@@ -187,100 +187,5 @@
         </div>
 
     </div>
-
-    <script>
-        (function () {
-            const pwd = document.getElementById('password');
-            const confirmInput = document.getElementById('password_confirmation');
-            const bars = document.querySelectorAll('#strength-bars span');
-            const strengthLabel = document.getElementById('strength-label');
-            const matchMsg = document.getElementById('match-message');
-            const form = document.getElementById('reset-form');
-            const btn = document.getElementById('reset-btn');
-            const spinner = document.getElementById('reset-spinner');
-            const label = document.getElementById('reset-label');
-
-            // Show / hide password (both fields)
-            document.querySelectorAll('[data-toggle-password]').forEach(function (toggle) {
-                const input = document.getElementById(toggle.dataset.togglePassword);
-                const open = toggle.querySelector('[data-eye-open]');
-                const closed = toggle.querySelector('[data-eye-closed]');
-
-                toggle.addEventListener('click', function () {
-                    const show = input.type === 'password';
-                    input.type = show ? 'text' : 'password';
-                    open.classList.toggle('hidden', show);
-                    closed.classList.toggle('hidden', !show);
-                    toggle.setAttribute('aria-pressed', show ? 'true' : 'false');
-                    input.focus();
-                });
-            });
-
-            // Password strength (guidance only; the server still validates)
-            const levels = [
-                {text: 'Weak',   bar: 'bg-rose-400',    txt: 'text-rose-300'},
-                {text: 'Fair',   bar: 'bg-amber-400',   txt: 'text-amber-300'},
-                {text: 'Good',   bar: 'bg-sky-400',     txt: 'text-sky-300'},
-                {text: 'Strong', bar: 'bg-emerald-400', txt: 'text-emerald-300'}
-            ];
-            const allBar = levels.map(function (l) { return l.bar; }).concat('bg-white/15');
-            const allTxt = levels.map(function (l) { return l.txt; });
-
-            function score(v) {
-                let s = 0;
-                if (v.length >= 8) s++;
-                if (/[a-z]/.test(v) && /[A-Z]/.test(v)) s++;
-                if (/\d/.test(v)) s++;
-                if (/[^A-Za-z0-9]/.test(v)) s++;
-                if (v.length < 6) s = Math.min(s, 1);
-                return Math.max(s, 1);
-            }
-
-            function updateStrength() {
-                const v = pwd.value;
-                const s = v ? score(v) : 0;
-                const level = levels[s - 1];
-
-                bars.forEach(function (bar, i) {
-                    bar.classList.remove.apply(bar.classList, allBar);
-                    bar.classList.add(i < s ? level.bar : 'bg-white/15');
-                });
-
-                strengthLabel.classList.remove.apply(strengthLabel.classList, allTxt);
-                strengthLabel.textContent = s ? '— ' + level.text : '';
-                if (s) strengthLabel.classList.add(level.txt);
-            }
-
-            // Match check
-            function updateMatch() {
-                matchMsg.classList.remove('text-emerald-300', 'text-rose-300');
-                if (!confirmInput.value) { matchMsg.textContent = ''; return; }
-
-                if (confirmInput.value === pwd.value) {
-                    matchMsg.textContent = '✓ Passwords match.';
-                    matchMsg.classList.add('text-emerald-300');
-                } else {
-                    matchMsg.textContent = 'Passwords do not match.';
-                    matchMsg.classList.add('text-rose-300');
-                }
-            }
-
-            pwd.addEventListener('input', function () { updateStrength(); updateMatch(); });
-            confirmInput.addEventListener('input', updateMatch);
-
-            // Prevent double submit
-            form.addEventListener('submit', function () {
-                btn.disabled = true;
-                spinner.classList.remove('hidden');
-                label.textContent = 'Resetting…';
-            });
-
-            window.addEventListener('pageshow', function () {
-                btn.disabled = false;
-                spinner.classList.add('hidden');
-                label.textContent = 'Reset Password';
-            });
-        })();
-    </script>
 
 @endsection

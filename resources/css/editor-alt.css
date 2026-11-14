@@ -1,0 +1,35 @@
+/* ویرایش alt تصاویر در ادیتور — منطق: resources/js/editor-image-alt.js (از post-form.js لود می‌شود) */
+
+.rte .ql-editor img { cursor: pointer; transition: outline-color .15s; }
+.rte .ql-editor img:hover { outline: 2px solid #a78bfa; outline-offset: 2px; }
+/* تصویر بدون alt: کادر زرد خط‌چین تا فراموش نشود */
+.rte .ql-editor img:not([alt]) { outline: 2px dashed #fbbf24; outline-offset: 2px; }
+
+.rte-hint { margin-top: .5rem; font-size: .78rem; color: rgb(255 255 255 / .5); }
+
+.alt-pop {
+    position: absolute; z-index: 1000; width: min(22rem, calc(100vw - 1rem)); padding: .9rem;
+    border-radius: 1rem; border: 1px solid rgb(255 255 255 / .2);
+    background: rgb(26 15 61 / .96); box-shadow: 0 20px 50px rgb(0 0 0 / .5);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+}
+.alt-pop[hidden] { display: none; }
+.alt-pop__label { display: block; margin-bottom: .4rem; font-size: .85rem; font-weight: 700; color: #fff; }
+.alt-pop__input {
+    width: 100%; padding: .55rem .75rem; border-radius: .75rem; font-size: .9rem; color: #fff;
+    background: rgb(255 255 255 / .08); border: 1px solid rgb(255 255 255 / .2); outline: none;
+}
+.alt-pop__input:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px rgb(167 139 250 / .25); }
+.alt-pop__input::placeholder { color: rgb(255 255 255 / .35); }
+.alt-pop__hint { margin-top: .4rem; font-size: .72rem; line-height: 1.7; color: rgb(255 255 255 / .5); }
+.alt-pop__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+.alt-pop__btn {
+    padding: .4rem .85rem; border-radius: .7rem; font-size: .8rem; font-weight: 600; cursor: pointer;
+    color: rgb(255 255 255 / .85); background: rgb(255 255 255 / .1); border: 1px solid rgb(255 255 255 / .15);
+    transition: background .15s;
+}
+.alt-pop__btn:hover { background: rgb(255 255 255 / .18); }
+.alt-pop__btn--primary { color: #fff; background: rgb(139 92 246 / .7); border-color: rgb(167 139 250 / .6); }
+.alt-pop__btn--primary:hover { background: rgb(139 92 246 / .9); }
+.alt-pop__btn--danger { margin-inline-start: auto; color: #fda4af; background: rgb(244 63 94 / .12); border-color: rgb(244 63 94 / .3); }
+.alt-pop__btn--danger:hover { background: rgb(244 63 94 / .25); }

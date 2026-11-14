@@ -1,21 +1,21 @@
 @extends('layout')
 
-@section('title', 'show-user')
+@section('title', 'نمایش کاربر')
 
 @section('content')
 
-    <section class="max-w-3xl mx-auto px-6 py-12">
+    <section dir="rtl" class="max-w-3xl mx-auto px-6 py-12">
 
         {{-- بازگشت --}}
-        <a href="{{ route('users.index') }}" class="btn-glass btn-sm">
-            ← Back to Users
+        <a href="{{ route('admin.users.index') }}" class="btn-glass btn-sm">
+            بازگشت به کاربران →
         </a>
 
         {{-- کارت کاربر --}}
         <div class="glass rounded-3xl p-6 md:p-10 mt-6">
 
             {{-- عکس + نام --}}
-            <div class="flex flex-col items-center text-center sm:flex-row sm:text-left gap-6 pb-8
+            <div class="flex flex-col items-center text-center sm:flex-row sm:text-right gap-6 pb-8
                         border-b border-white/10">
 
                 <span class="user-avatar is-xl">
@@ -34,7 +34,7 @@
                     @if($user->created_at)
                         <p class="mt-2 inline-block rounded-full border border-white/15 bg-white/10
                                   px-3 py-1 text-xs text-white/65">
-                            Member since {{ $user->created_at->format('Y-m-d') }}
+                            عضو از {{ $user->created_at_fa }}
                         </p>
                     @endif
                 </div>
@@ -44,37 +44,37 @@
             <dl class="mt-8 space-y-6">
 
                 <div>
-                    <dt class="block text-sm font-semibold text-white/70 mb-2">Name</dt>
+                    <dt class="block text-sm font-semibold text-white/70 mb-2">نام</dt>
                     <dd class="glass-input cursor-default select-text break-words">
                         {{ $user->name }}
                     </dd>
                 </div>
 
                 <div>
-                    <dt class="block text-sm font-semibold text-white/70 mb-2">Email</dt>
+                    <dt class="block text-sm font-semibold text-white/70 mb-2">ایمیل</dt>
                     <dd dir="ltr" class="glass-input cursor-default select-text break-all text-left">
                         {{ $user->email }}
                     </dd>
                 </div>
 
                 <div>
-                    <dt class="block text-sm font-semibold text-white/70 mb-2">User role</dt>
+                    <dt class="block text-sm font-semibold text-white/70 mb-2">نقش کاربر</dt>
                     <dd>
                         {{-- فقط نمایشی (disabled)؛ تغییر نقش از صفحه‌ی ویرایش انجام می‌شود --}}
-                        <select disabled class="glass-input cursor-default opacity-100" aria-label="User role">
-                            <option value="admin" @selected($user->role === 'admin')>Admin</option>
-                            <option value="subscriber" @selected($user->role !== 'admin')>Subscriber</option>
+                        <select disabled class="glass-input cursor-default opacity-100" aria-label="نقش کاربر">
+                            <option value="admin" @selected($user->role === 'admin')>مدیر</option>
+                            <option value="subscriber" @selected($user->role !== 'admin')>کاربر عادی</option>
                         </select>
                     </dd>
                 </div>
 
                 <div>
-                    <dt class="block text-sm font-semibold text-white/70 mb-2">Profile photo</dt>
+                    <dt class="block text-sm font-semibold text-white/70 mb-2">عکس پروفایل</dt>
                     <dd class="glass-input cursor-default break-all">
                         @if($user->avatar)
                             <span dir="ltr" class="block text-left text-white/80">{{ $user->avatar }}</span>
                         @else
-                            <span class="text-white/45">No photo uploaded.</span>
+                            <span class="text-white/45">عکسی بارگذاری نشده است.</span>
                         @endif
                     </dd>
                 </div>
@@ -86,7 +86,7 @@
                 <div class="mt-8 flex flex-wrap items-center gap-3 border-t border-white/10 pt-6">
 
                     @can('update_user', $user)
-                        <a href="{{ route('users.edit', $user) }}" class="btn-edit">
+                        <a href="{{ route('admin.users.edit', $user) }}" class="btn-edit">
                             <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                  stroke-width="1.8" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -97,7 +97,7 @@
                     @endcan
 
                     @can('delete_user', $user)
-                        <form action="{{ route('users.destroy', $user) }}"
+                        <form action="{{ route('admin.users.destroy', $user) }}"
                               method="POST"
                               onsubmit="return confirm('مطمئنی می‌خوای این کاربر رو حذف کنی؟')">
                             @csrf

@@ -7,86 +7,58 @@
         'trash' => 'm14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0',
         'doc'   => 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z',
         'home'  => 'm2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25',
+        // آیکن‌های زیرمنوها (Heroicons outline)
+        'users-all'  => 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z',
+        'user-plus'  => 'M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z',
+        'chats'      => 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155',
+        'clock'      => 'M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+        'check'      => 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+        'stack'      => 'M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122',
+        'send'       => 'M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5',
+        'pencil'     => 'm16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10',
+        'calendar'   => 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5',
+        'archive'    => 'm20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z',
+        'user'  => 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z',
     ];
 
-    $pending = \App\Models\Comment::pending()->count();
+    $pending = $pendingCommentsCount ?? 0;
+
+    // چهار آیتم اول در نوار پایین موبایل می‌آیند؛ بقیه داخل «بیشتر».
+    // children = زیرمنوی کشویی (فقط دسکتاپ)؛ در موبایل خودِ صفحه‌ها تب/دکمه‌ی همین بخش‌ها را دارند.
+    $postStatuses = [\App\Enums\PostStatus::Published, \App\Enums\PostStatus::Draft, \App\Enums\PostStatus::Scheduled, \App\Enums\PostStatus::Archived];
+    $statusIcons  = ['published' => $icons['send'], 'draft' => $icons['pencil'], 'scheduled' => $icons['calendar'], 'archived' => $icons['archive']];
+
+    // مسیر ساخت کاربر: اگر با پیشوند admin. تعریف نکرده‌ای، همان users.create
+    $userCreateRoute = 'admin.users.create';
 
     $links = [
-        ['label' => 'آمار',          'icon' => 'chart', 'route' => 'admin.dashboard',      'active' => 'admin.dashboard'],
-        ['label' => 'کاربران',       'icon' => 'users', 'route' => 'users.index',          'active' => 'users.*'],
-        ['label' => 'کامنت‌ها',      'icon' => 'chat',  'route' => 'admin.comments.index', 'active' => 'admin.comments.index', 'badge' => $pending],
-        ['label' => 'سطل زباله',     'icon' => 'trash', 'route' => 'admin.comments.trash', 'active' => 'admin.comments.trash'],
-        ['label' => 'پست‌ها',        'icon' => 'doc',   'route' => 'admin.posts.index',    'active' => 'admin.posts.*'],
+        ['label' => 'آمار', 'short' => 'آمار', 'd' => $icons['chart'], 'route' => 'admin.dashboard', 'active' => 'admin.dashboard'],
+
+        ['label' => 'کاربران', 'short' => 'کاربران', 'd' => $icons['users'], 'route' => 'admin.users.index', 'active' => 'admin.users.*',
+         'children' => [
+             ['label' => 'همه‌ی کاربران', 'route' => 'admin.users.index', 'd' => $icons['users-all']],
+             ['label' => 'ساخت کاربر',    'route' => $userCreateRoute,       'd' => $icons['user-plus']],
+         ]],
+
+        ['label' => 'کامنت‌ها', 'short' => 'کامنت‌ها', 'd' => $icons['chat'], 'route' => 'admin.comments.index', 'active' => 'admin.comments.*', 'badge' => $pending,
+         'children' => [
+             ['label' => 'همه‌ی کامنت‌ها', 'route' => 'admin.comments.index', 'd' => $icons['chats']],
+             ['label' => 'در انتظار تایید', 'route' => 'admin.comments.index', 'params' => ['status' => 'pending'],  'd' => $icons['clock']],
+             ['label' => 'تایید شده',       'route' => 'admin.comments.index', 'params' => ['status' => 'approved'], 'd' => $icons['check']],
+             ['label' => 'سطل زباله',       'route' => 'admin.comments.trash', 'd' => $icons['trash']],
+         ]],
+
+        ['label' => 'پست‌ها', 'short' => 'پست‌ها', 'd' => $icons['doc'], 'route' => 'admin.posts.index', 'active' => 'admin.posts.*',
+         'children' => [
+             ['label' => 'همه‌ی پست‌ها', 'route' => 'admin.posts.index', 'd' => $icons['stack']],
+             ...array_map(fn ($s) => ['label' => $s->label(), 'route' => 'admin.posts.index', 'params' => ['status' => $s->value], 'd' => $statusIcons[$s->value]], $postStatuses),
+         ]],
+    ];
+
+    $footLinks = [
+        ['label' => 'داشبورد کاربری', 'd' => $icons['user'], 'route' => 'dashboard'],
+        ['label' => 'بازگشت به سایت', 'd' => $icons['home'], 'route' => 'home'],
     ];
 @endphp
 
-{{-- دسکتاپ: ستون ثابت کنار صفحه | موبایل و تبلت: نوار افقی قابل اسکرول (بدون اسکرول‌بار، با محو شدن لبه‌ها) --}}
-<style>
-    .admin-tabs { scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
-    .admin-tabs::-webkit-scrollbar { display: none; }
-    .admin-tabs > a { scroll-snap-align: center; }
-    @media (max-width: 1023.98px) {
-        .admin-tabs-wrap::before, .admin-tabs-wrap::after {
-            content: ''; position: absolute; top: 0; bottom: 0; width: 1.5rem; z-index: 1; pointer-events: none;
-        }
-        .admin-tabs-wrap::before { inset-inline-start: 0; background: linear-gradient(to right, rgb(11 7 32 / .55), transparent); }
-        .admin-tabs-wrap::after  { inset-inline-end: 0;  background: linear-gradient(to left,  rgb(11 7 32 / .55), transparent); }
-    }
-</style>
-
-<div class="admin-tabs-wrap glass relative rounded-2xl lg:rounded-3xl p-2 lg:p-3 lg:sticky lg:top-24"
-     role="navigation" aria-label="Admin sections">
-
-    <p class="hidden lg:block px-4 pt-2 pb-3 text-xs font-semibold tracking-wide text-white/40">پنل مدیریت</p>
-
-    <div class="admin-tabs flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible px-2 lg:px-0">
-
-        @foreach($links as $link)
-            @php($current = request()->routeIs($link['active']))
-
-            <a href="{{ route($link['route']) }}"
-               class="flex flex-none items-center gap-2 lg:gap-3 rounded-xl lg:rounded-2xl px-3 lg:px-4 py-2 lg:py-2.5 text-sm font-semibold whitespace-nowrap transition
-                      {{ $current ? 'bg-white/15 text-white shadow-inner' : 'text-white/65 hover:bg-white/10 hover:text-white' }}"
-               @if($current) aria-current="page" @endif>
-
-                <svg class="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                     stroke-width="1.8" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons[$link['icon']] }}"/>
-                </svg>
-
-                <span class="lg:flex-1">{{ $link['label'] }}</span>
-
-                @if(($link['badge'] ?? 0) > 0)
-                    <span class="rounded-full bg-amber-400/20 px-2 py-0.5 text-xs font-semibold text-amber-200">
-                        {{ $link['badge'] }}
-                    </span>
-                @endif
-            </a>
-        @endforeach
-
-        <span class="hidden lg:block my-2 mx-3 h-px bg-white/10"></span>
-        <span class="lg:hidden flex-none self-center mx-1 h-5 w-px bg-white/15"></span>
-
-        <a href="{{ route('posts.index') }}"
-           class="flex flex-none items-center gap-2 lg:gap-3 rounded-xl lg:rounded-2xl px-3 lg:px-4 py-2 lg:py-2.5 text-sm font-semibold whitespace-nowrap
-                  text-white/50 transition hover:bg-white/10 hover:text-white">
-            <svg class="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                 stroke-width="1.8" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['home'] }}"/>
-            </svg>
-            بازگشت به سایت
-        </a>
-
-    </div>
-</div>
-
-<script>
-    // روی موبایل، تب فعال را به وسط نوار بیاور
-    (function () {
-        const active = document.querySelector('.admin-tabs a[aria-current="page"]');
-        if (!active) return;
-        const bar = active.parentElement;
-        if (bar.scrollWidth <= bar.clientWidth) return;
-        bar.scrollLeft = active.offsetLeft - (bar.clientWidth - active.offsetWidth) / 2;
-    })();
-</script>
+@include('panel._sidebar', ['panelTitle' => 'پنل مدیریت', 'links' => $links, 'footLinks' => $footLinks])

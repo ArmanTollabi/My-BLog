@@ -1,346 +1,210 @@
 @extends('layout')
-@section('title','Posts')
+@section('title', $post->title)
 @section('content')
 
-    <section class="max-w-5xl mx-auto px-6 py-12">
-        <a href="{{ route('posts.index') }}" class="btn-glass">
-            ← Back to Posts
-        </a>
-        <div class="space-y-5 mt-5"> <!-- Post 1 -->
-            <article class="bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-md transition">
-                <div class="flex flex-col gap-4">
-                    <div>
-                        @if ($post->image)
-                            <img src="{{ Storage::url($post->image) }}" alt="{{ $post->title }}"
-                                 class="w-full h-64 object-cover rounded-xl mb-6">
+    <x-seo :title="$post->title" :description="$post->description" :image="$post->image_url" type="article"
+           :published="$post->published_at ?? $post->created_at" :modified="$post->updated_at" :author="$post->user?->name" :noindex="! $post->isPublic()" />
+
+    {{-- نوار پیشرفت مطالعه (رفتار: resources/js/reading-progress.js) --}}
+    <div class="ps-progress" data-reading-progress aria-hidden="true"><span></span></div>
+
+    <article class="ps">
+
+        {{-- هشدار برای پست منتشرنشده (فقط نویسنده/ادمین به این صفحه می‌رسند) --}}
+        @unless($post->isPublic())
+            <div class="ps-wrap">
+                <div class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100" role="status">
+                    <x-post-status :post="$post" />
+                    <span>
+                        @if($post->effective_status === \App\Enums\PostStatus::Scheduled)
+                            این پست در {{ $post->published_at_with_hours_fa }} منتشر می‌شود.
+                        @else
+                            این پست برای بازدیدکنندگان نمایش داده نمی‌شود؛ فقط تو و مدیران سایت آن را می‌بینید.
                         @endif
-                        <span
-                            class="inline-block text-xs font-semibold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">
-                            {{$post->category->title ?? ''}}
-                        </span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-900">
-                        {{$post->title}}
-                    </h2>
-                    {{-- متن پست: HTML پاک‌سازی‌شده‌ی ادیتور (برای پست‌های قدیمی: متن ساده با خط‌شکن) --}}
-                    <div class="rich-content">
-                        {!! $post->body_html !!}
-                    </div>
-                    <p class="text-gray-500 leading-7">
-                        Author: {{$post->user->name}}
-                    </p>
+                    </span>
+                    @can('update', $post)
+                        <a href="{{ route('posts.edit', $post) }}" class="ms-auto font-bold text-violet-200 hover:underline">ویرایش و تغییر وضعیت</a>
+                    @endcan
+                </div>
+            </div>
+        @endunless
 
-                    {{-- لایک: فقط در همین صفحه قابل کلیک است --}}
-                    <div class="flex items-center gap-3">
-                        <button type="button" id="like-btn"
-                                class="like-btn {{ $liked ? 'is-liked' : '' }}"
-                                data-url="{{ route('posts.like', $post) }}"
-                                data-auth="{{ auth()->check() ? '1' : '0' }}"
-                                aria-pressed="{{ $liked ? 'true' : 'false' }}"
-                                aria-label="Like">
-                            <svg class="like-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.8"
-                                 stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                            </svg>
-                            <span id="like-count" class="like-count">{{ number_format($post->likes_count) }}</span>
-                        </button>
-                        <span id="like-error" class="text-xs text-rose-300 empty:hidden" role="status"></span>
-                    </div>
-                    @if($post->tags->isNotEmpty())
-                        <div class="flex flex-wrap items-center gap-2 mt-4">
-                            @foreach($post->tags as $tag)
-                                <a
-                                    href="{{ route('tags.show', $tag) }}"
-                                    class="inline-flex items-center px-3 py-1.5
-                       rounded-full text-sm font-medium
-                       bg-purple-100 text-purple-700
-                       hover:bg-purple-200 transition"
-                                >
-                                    #{{ $tag->title }}
-                                </a>
-                            @endforeach
-                        </div>
-                    @endif
-                    @auth
+        {{-- ===== ۱) عنوان ===== --}}
+        <div class="ps-wrap ps-head">
+            <h1 class="ps-title">{{ $post->title }}</h1>
 
-                        <form
-                            action="{{ route('comments.store', $post) }}"
-                            method="POST"
-                            class="mt-8"
-                        >
+            {{-- ===== ۲) مسیر صفحه (breadcrumb) ===== --}}
+            <x-breadcrumbs :items="array_filter([
+                ['label' => 'خانه', 'url' => route('home')],
+                ['label' => 'پست‌ها', 'url' => route('posts.index')],
+                $post->category ? ['label' => $post->category->title, 'url' => route('categories.show', $post->category)] : null,
+                ['label' => $post->title],
+            ])" />
+        </div>
 
-                            @csrf
+        {{-- ===== ۳) تصویر شاخص ===== --}}
+        @if($post->image)
+            <figure class="ps-cover">
+                <img src="{{ $post->image_url }}" alt="{{ $post->title }}" width="1200" height="750" fetchpriority="high" decoding="async">
+            </figure>
+        @endif
 
-                            <label
-                                for="body"
-                                class="block text-sm font-semibold text-gray-700 mb-2"
-                            >
-                                Add a comment
-                            </label>
+        <div class="ps-wrap ps-layout">
 
-                            <textarea
-                                name="body"
-                                id="body"
-                                rows="4"
-                                placeholder="Write your comment..."
-                                class="w-full px-4 py-3 border border-gray-300
-                   rounded-lg resize-none
-                   focus:outline-none focus:ring-2
-                   focus:ring-indigo-500"
-                            >{{ old('body') }}</textarea>
+            {{-- ===== ستون کناری (دسکتاپ: سمت چپ و چسبان | موبایل: فهرست زیر اطلاعات، دسته‌ها آخر صفحه) ===== --}}
+            <aside class="ps-side">
 
-                            @error('body')
-                            <p class="text-red-500 text-sm mt-2">
-                                {{ $message }}
-                            </p>
-                            @enderror
+                {{-- فهرست مطالب: توسط resources/js/post-toc.js از h1..h3 متن ساخته و نمایش داده می‌شود --}}
+                <details class="ps-toc ps-box glass" data-toc hidden>
+                    <summary class="ps-box-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
+                        فهرست مطالب
+                    </summary>
+                    <ol class="ps-toc-list" data-toc-list></ol>
+                </details>
 
-                            <button type="submit" class="btn-create mt-3">
-                                Post Comment
-                            </button>
-
-                        </form>
-                    @else
-
-                        <p class="mt-8 text-gray-500">
-                            برای ثبت کامنت باید وارد حساب کاربری خود شوید.
-                        </p>
-
-                    @endauth
-                    <section class="mt-12">
-
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">
-                            Comments
+                @if($categories->isNotEmpty())
+                    <nav class="ps-cats ps-box glass" aria-labelledby="ps-cats-title">
+                        <h2 id="ps-cats-title" class="ps-box-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/></svg>
+                            دسته‌بندی‌ها
                         </h2>
+                        <ul class="ps-cats-list">
+                            @foreach($categories as $cat)
+                                <li>
+                                    <a href="{{ route('categories.show', $cat) }}"
+                                       class="{{ $cat->id === $post->category_id ? 'is-current' : '' }}"
+                                       @if($cat->id === $post->category_id) aria-current="true" @endif>
+                                        <span>{{ $cat->title }}</span>
+                                        <span class="ps-cats-count">{{ \App\Support\Fa::number($cat->posts_count) }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </nav>
+                @endif
+            </aside>
 
-                        @forelse($comments as $comment)
+            <div class="ps-main">
 
-                            {{-- هر کامنت (و ریپلای‌هایش) در قالب comments/_item رندر می‌شود --}}
-                            @include('comments._item', ['comment' => $comment, 'isReply' => false])
+            {{-- ===== ۴) نویسنده، تاریخ، زمان مطالعه، بازدید ===== --}}
+            <div class="ps-meta">
+                @include('posts._meta', ['post' => $post, 'size' => 'lg'])
 
-                        @empty
+                <ul class="ps-facts" aria-label="اطلاعات پست">
+                    <li title="زمان مطالعه">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                        {{ $post->reading_time_fa }} دقیقه مطالعه
+                    </li>
+                    <li title="تعداد بازدید">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                        {{ $post->views_fa }} بازدید
+                    </li>
+                    <li title="تعداد لایک">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/></svg>
+                        {{ \App\Support\Fa::number($post->likes_count) }}
+                    </li>
+                </ul>
+            </div>
 
-                            <p class="text-gray-400">
-                                هنوز کامنتی برای این پست ثبت نشده.
-                            </p>
+            {{-- ===== ۵) متن پست (HTML پاک‌سازی‌شده‌ی ادیتور؛ پست‌های قدیمی: متن ساده با خط‌شکن) ===== --}}
+            <div class="ps-body rich-content" data-reading-body>
+                {!! $post->body_html !!}
+            </div>
 
-                        @endforelse
-                        <div class="mt-6">
-                            {{$comments->links()}}
-                        </div>
+            @if($post->tags->isNotEmpty())
+                <div class="ps-tags" aria-label="تگ‌ها">
+                    @foreach($post->tags as $tag)
+                        <a href="{{ route('tags.show', $tag) }}" class="ps-tag">#{{ $tag->title }}</a>
+                    @endforeach
+                </div>
+            @endif
 
-                    </section>
-                    <div class="flex flex-row items-center gap-3 mt-2">
+            {{-- لایک / ذخیره / مدیریت --}}
+            <div class="ps-actions glass">
+                <button type="button" data-toggle-btn data-kind="like"
+                        class="like-btn {{ $liked ? 'is-liked' : '' }}"
+                        data-url="{{ route('posts.like', $post) }}"
+                        data-auth="{{ auth()->check() ? '1' : '0' }}"
+                        aria-pressed="{{ $liked ? 'true' : 'false' }}" aria-label="لایک">
+                    <svg class="like-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                    </svg>
+                    <span data-like-count class="like-count">{{ number_format($post->likes_count) }}</span>
+                </button>
 
+                <button type="button" data-toggle-btn data-kind="save"
+                        class="like-btn save-btn {{ $saved ? 'is-saved' : '' }}"
+                        data-url="{{ route('posts.save', $post) }}"
+                        data-auth="{{ auth()->check() ? '1' : '0' }}"
+                        aria-pressed="{{ $saved ? 'true' : 'false' }}" aria-label="ذخیره">
+                    <svg class="like-heart save-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
+                    </svg>
+                    <span class="like-count">ذخیره</span>
+                </button>
+
+                @canany(['update', 'delete'], $post)
+                    <div class="ps-admin">
                         @can('update', $post)
-                            <a href="{{ route('posts.edit', $post) }}"
-                               class="btn-edit">
-                                ویرایش
-                            </a>
+                            <a href="{{ route('posts.edit', $post) }}" class="btn-edit">ویرایش</a>
                         @endcan
-
                         @can('delete', $post)
-                            <form action="{{ route('posts.destroy', $post) }}"
-                                  method="POST"
-                                  onsubmit="return confirm('مطمئنی می‌خوای این پست رو حذف کنی؟')">
+                            <form action="{{ route('posts.destroy', $post) }}" method="POST"
+                                  data-confirm="مطمئنی می‌خوای این پست رو حذف کنی؟">
                                 @csrf
                                 @method('DELETE')
-
-                                <button type="submit"
-                                        class="btn-delete">
-                                    حذف
-                                </button>
+                                <button type="submit" class="btn-delete">حذف</button>
                             </form>
                         @endcan
-
                     </div>
-                </div>
-            </article>
-        </div>
-    </section>
+                @endcanany
 
-    <style>
-        /* ---------- دکمه‌ی لایک ---------- */
-        .like-btn {
-            display: inline-flex; align-items: center; gap: .55rem;
-            padding: .5rem 1.1rem; border-radius: 9999px; cursor: pointer;
-            color: rgb(244 241 255 / .75);
-            background: rgb(255 255 255 / .08);
-            border: 1px solid rgb(255 255 255 / .22);
-            transition: background .2s, color .2s, border-color .2s, transform .2s;
-        }
-        .like-btn:hover { background: rgb(255 255 255 / .16); color: #fff; transform: translateY(-1px); }
-        .like-btn:disabled { opacity: .7; cursor: progress; }
-        .like-btn:focus-visible { outline: 2px solid rgb(167 139 250 / .9); outline-offset: 3px; }
-        .like-heart { width: 1.4rem; height: 1.4rem; fill: none; transition: fill .2s, transform .2s; }
-        .like-count { font-weight: 700; min-width: 1ch; font-variant-numeric: tabular-nums; }
-        .like-btn.is-liked { color: #fb7185; background: rgb(244 63 94 / .14); border-color: rgb(244 63 94 / .45); }
-        .like-btn.is-liked .like-heart { fill: currentColor; }
-        .like-btn.pop .like-heart { animation: like-pop .45s cubic-bezier(.2, .9, .3, 1.6); }
-        @keyframes like-pop { 0% { transform: scale(1); } 40% { transform: scale(1.45); } 100% { transform: scale(1); } }
-
-        /* ---------- پاپ‌آپ ورود ---------- */
-        .login-modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 1rem; }
-        .login-modal[hidden] { display: none; }
-        .login-modal-backdrop { position: absolute; inset: 0; background: rgb(8 4 24 / .65); backdrop-filter: blur(6px); animation: lm-fade .2s ease; }
-        .login-modal-card {
-            position: relative; width: 100%; max-width: 26rem; padding: 2.25rem 1.75rem 1.75rem;
-            border-radius: 1.75rem; text-align: center; background: rgb(22 12 54 / .92);
-            box-shadow: 0 30px 80px rgb(0 0 0 / .6); animation: lm-pop .28s cubic-bezier(.2, .9, .3, 1.2);
-        }
-        .login-modal-close {
-            position: absolute; top: .9rem; inset-inline-end: .9rem; display: grid; place-items: center;
-            width: 2.2rem; height: 2.2rem; border-radius: 9999px; color: rgb(244 241 255 / .7);
-            background: rgb(255 255 255 / .08); transition: background .2s, color .2s;
-        }
-        .login-modal-close:hover { background: rgb(255 255 255 / .2); color: #fff; }
-        .login-modal-icon {
-            display: grid; place-items: center; width: 4.5rem; height: 4.5rem; margin: 0 auto; border-radius: 1.4rem; color: #fff;
-            background: linear-gradient(135deg, #f43f5e, #8b5cf6); box-shadow: 0 12px 35px rgb(244 63 94 / .45);
-            animation: float-soft 4s ease-in-out infinite;
-        }
-        @keyframes lm-fade { from { opacity: 0; } }
-        @keyframes lm-pop { from { opacity: 0; transform: translateY(14px) scale(.94); } }
-    </style>
-
-    {{-- پاپ‌آپ «برای لایک باید وارد شوید» (فقط مهمان‌ها) --}}
-    @guest
-        <div id="login-modal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title" hidden>
-            <div class="login-modal-backdrop" data-close></div>
-
-            <div class="login-modal-card glass">
-                <button type="button" class="login-modal-close" data-close aria-label="Close">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="2" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-
-                <div class="login-modal-icon" aria-hidden="true">
-                    <svg class="w-9 h-9" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"/>
-                    </svg>
-                </div>
-
-                <h2 id="login-modal-title" class="mt-5 text-2xl font-extrabold text-white">این پست را دوست داشتید؟</h2>
-                <p class="mt-2 text-white/65 leading-7">
-                    برای لایک کردن باید وارد حساب کاربری‌تان شوید یا ثبت‌نام کنید. فقط چند ثانیه طول می‌کشد!
-                </p>
-
-                <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                    <a href="{{ route('login') }}" class="btn-create justify-center">ورود به حساب</a>
-                    <a href="{{ route('register') }}" class="btn-glass justify-center">ثبت‌نام</a>
-                </div>
-
-                <button type="button" data-close class="mt-5 text-sm text-white/50 transition hover:text-white">
-                    فعلاً نه، ممنون
-                </button>
+                <span data-toggle-error class="ps-error text-xs text-rose-300 empty:hidden" role="status"></span>
             </div>
-        </div>
-    @endguest
 
-    <script>
-        // حالت ویرایش: متن و دکمه‌های همان کامنت پنهان و فرم ویرایش نمایش داده می‌شود
-        function toggleEdit(id, editing) {
-            document.getElementById('comment-view-' + id).classList.toggle('hidden', editing);
-            document.getElementById('comment-actions-' + id).classList.toggle('hidden', editing);
-            document.getElementById('comment-edit-' + id).classList.toggle('hidden', !editing);
-        }
+            {{-- ===== ۶) دیدگاه‌ها ===== --}}
+            <section class="ps-comments" aria-labelledby="comments-title">
+                <h2 id="comments-title" class="ps-section-title">
+                    دیدگاه‌ها <span class="ps-count">{{ \App\Support\Fa::number($post->approved_comments_count) }}</span>
+                </h2>
 
-        function editComment(id) {
-            toggleEdit(id, true);
-        }
+                @auth
+                    <form action="{{ route('comments.store', $post) }}" method="POST" class="ps-form glass">
+                        @csrf
+                        <label for="body" class="field-label">دیدگاه خود را بنویسید</label>
+                        <textarea name="body" id="body" rows="4" required class="field"
+                                  placeholder="نظر، سؤال یا تجربه‌ی خود را بنویسید…">{{ old('body') }}</textarea>
+                        @error('body')
+                            <p class="mt-2 text-sm text-rose-300">{{ $message }}</p>
+                        @enderror
+                        <button type="submit" class="btn-create mt-3">ثبت دیدگاه</button>
+                    </form>
+                @else
+                    <p class="ps-login-hint glass">
+                        برای ثبت دیدگاه باید
+                        <a href="{{ route('login') }}" class="font-bold text-violet-300 hover:text-violet-200">وارد حساب کاربری</a>
+                        خود شوید.
+                    </p>
+                @endauth
 
-        function cancelEdit(id) {
-            toggleEdit(id, false);
-        }
+                <div class="mt-6">
+                    @forelse($comments as $comment)
+                        @include('comments._item', ['comment' => $comment, 'isReply' => false])
+                    @empty
+                        <p class="py-8 text-center text-white/45">هنوز دیدگاهی ثبت نشده؛ اولین نفر باش!</p>
+                    @endforelse
+                </div>
 
-        function replyToComment(id) {
-            document.getElementById('reply-form-' + id).classList.toggle('hidden');
-        }
-    </script>
+                <div class="mt-6">{{ $comments->links() }}</div>
+            </section>
+
+            </div>{{-- /.ps-main --}}
+        </div>{{-- /.ps-layout --}}
+    </article>
+
+    @include('posts._login-modal')
 
 @endsection
-
-@push('scripts')
-    <script>
-        (function () {
-            const btn = document.getElementById('like-btn');
-            if (!btn) return;
-
-            const countEl = document.getElementById('like-count');
-            const errorEl = document.getElementById('like-error');
-            const modal = document.getElementById('login-modal');
-            const csrf = @json(csrf_token());
-            let busy = false;
-            let lastFocus = null;
-
-            // ---------- پاپ‌آپ ----------
-            function openModal() {
-                if (!modal) { window.location.href = @json(route('login')); return; }
-                lastFocus = document.activeElement;
-                modal.hidden = false;
-                document.body.style.overflow = 'hidden';
-                const first = modal.querySelector('a.btn-create');
-                if (first) first.focus();
-            }
-            function closeModal() {
-                if (!modal || modal.hidden) return;
-                modal.hidden = true;
-                document.body.style.overflow = '';
-                if (lastFocus) lastFocus.focus();
-            }
-            if (modal) {
-                modal.addEventListener('click', function (e) {
-                    if (e.target.closest('[data-close]')) closeModal();
-                });
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape') closeModal();
-                });
-            }
-
-            // ---------- لایک ----------
-            function render(liked, count) {
-                btn.classList.toggle('is-liked', liked);
-                btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
-                countEl.textContent = Number(count).toLocaleString('en-US');
-                btn.classList.remove('pop');
-                void btn.offsetWidth;            // ری‌استارت انیمیشن
-                if (liked) btn.classList.add('pop');
-            }
-
-            btn.addEventListener('click', async function () {
-                if (btn.dataset.auth !== '1') { openModal(); return; }   // مهمان
-                if (busy) return;
-
-                busy = true;
-                btn.disabled = true;
-                errorEl.textContent = '';
-
-                try {
-                    const res = await fetch(btn.dataset.url, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': csrf,
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
-                    });
-
-                    if (res.status === 401) { btn.dataset.auth = '0'; openModal(); return; }
-                    if (res.status === 419) { errorEl.textContent = 'نشست شما منقضی شده است؛ صفحه را رفرش کن.'; return; }
-                    if (!res.ok) throw new Error('bad status');
-
-                    const data = await res.json();
-                    render(data.liked, data.count);
-                } catch (e) {
-                    errorEl.textContent = 'خطا در ثبت لایک، دوباره تلاش کن.';
-                } finally {
-                    busy = false;
-                    btn.disabled = false;
-                }
-            });
-        })();
-    </script>
-@endpush

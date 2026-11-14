@@ -1,11 +1,10 @@
-{{-- FILE: resources/views/admin/comments/index.blade.php --}}
 @extends('admin.layout')
 
-@section('title', 'Comments')
+@section('title', 'مدیریت کامنت‌ها')
 
 @section('admin-content')
 
-    <section>
+    <section dir="rtl">
 
         <div class="mb-6">
             <h1 class="text-3xl md:text-4xl font-bold gradient-text">مدیریت کامنت‌ها</h1>
@@ -22,9 +21,9 @@
 
             <input type="text" name="search" value="{{ request('search') }}"
                    placeholder="جستجو در متن کامنت یا نام کاربر..."
-                   aria-label="Search comments" class="glass-input h-12 min-w-56 flex-1">
+                   aria-label="جستجو در کامنت‌ها" class="glass-input h-12 min-w-56 flex-1">
 
-            <button type="submit" class="btn-create !h-12">Search</button>
+            <button type="submit" class="btn-create !h-12">جستجو</button>
         </form>
 
         @forelse($comments as $comment)
@@ -61,7 +60,7 @@
                         </div>
 
                         <p class="text-sm text-white/55 mt-1">
-                            {{ $comment->created_at->format('Y-m-d H:i') }}
+                            {{ $comment->created_at_with_hours_fa }}
                             ·
                             در پست
                             @if($comment->post)
@@ -92,7 +91,7 @@
                     @endif
 
                     <form action="{{ route('admin.comments.destroy', $comment) }}" method="POST"
-                          onsubmit="return confirm('این کامنت به سطل زباله منتقل شود؟')">
+                          data-confirm="این کامنت به سطل زباله منتقل شود؟">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn-delete btn-sm">انتقال به سطل زباله</button>
                     </form>

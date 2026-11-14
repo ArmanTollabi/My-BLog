@@ -2,23 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Password;
+use App\Services\ImageService;
+use App\Support\SearchTerm;
 
 class UserController extends Controller
 {
-    public function index(User $user,request $request){
-        $this->authorize('access_user', $user);
+    public function index(Request $request){
+        $this->authorize('access_user', User::class);
 
-        $users = User::withCount('posts')->when($request->search,function ($query,$search){
-            $query->where(function ($query) use ($search){
-                $query->where('name','like','%'.$search.'%')
-                    ->orWhere('email','like','%'.$search.'%');
+        $term = SearchTerm::clean($request->query('search'));
+
+        $users = User::withCount('posts')->when($term !== '',function ($query) use ($term){
+            $like = SearchTerm::like($term);
+            $query->where(function ($query) use ($like){
+                $query->where('name','like',$like)
+                    ->orWhere('email','like',$like);
             });
         })
             ->when($request->post_filter === 'most',function ($query){
@@ -39,28 +44,29 @@ class UserController extends Controller
             ->oldest()
             ->paginate(4)
             ->withQueryString();
-        return view('users.index', compact('users'));
+        return view('admin.users.index', compact('users'));
 
     }
 
     public function show(User $user)
     {
-        $this->authorize('is-admin', $user);
-        return view('users.show', compact('user'));
+        $this->authorize('isAdmin', $user);
+        return view('admin.users.show', compact('user'));
     }
 
     public function create()
     {   $this->authorize('access_user', User::class);
-        return view('users.create');
+        return view('admin.users.create');
     }
 
     public function store(Request $request){
+        $this->authorize('access_user', User::class); // قبلاً چک نمی‌شد
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
-            'role' => ['required', Rule::in(['admin', 'subscriber'])],
-            'avatar_path' => ['nullable','string']
+            'role' => ['required', Rule::enum(UserRole::class)],
+            'avatar_path' => ['nullable','string','max:255','regex:#^users-avatar/uploads/[\w/\-]+\.webp$#']
         ]);
 
         $validated['avatar'] = $validated['avatar_path'] ?? null;
@@ -68,12 +74,12 @@ class UserController extends Controller
 
         unset($validated['avatar_path']);
         User::create($validated);
-        return redirect()->route('users.index')->with('success', 'User created successfully');
+        return redirect()->route('admin.users.index')->with('success', 'کاربر با موفقیت ایجاد شد');
     }
 
     public function edit(User $user){
         $this->authorize('update_user',$user);
-        return view('users.edit', compact('user'));
+        return view('admin.users.edit', compact('user'));
     }
 
     public function update(Request $request,User $user){
@@ -81,7 +87,7 @@ class UserController extends Controller
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255',Rule::unique('users')->ignore($user)],
-            'avatar_path' => ['nullable','string']
+            'avatar_path' => ['nullable','string','max:255','regex:#^users-avatar/uploads/[\w/\-]+\.webp$#']
         ]);
 
         if(!empty($validatedData['avatar_path'])){
@@ -95,9 +101,9 @@ class UserController extends Controller
         unset($validatedData['avatar_path']);
 
         // تغییر نقش: فقط ادمین، و نه روی حساب خودش (جلوگیری از قفل شدن پنل و ارتقای نقش توسط کاربر عادی)
-        if ($request->user()->role === 'admin' && ! $user->is($request->user())) {
+        if ($request->user()->isAdmin() && ! $user->is($request->user())) {
             $validatedData['role'] = $request->validate([
-                'role' => ['required', Rule::in(['admin', 'subscriber'])],
+                'role' => ['required', Rule::enum(UserRole::class)],
             ])['role'];
         }
 
@@ -118,20 +124,20 @@ class UserController extends Controller
         }
         $user->update($validatedData);
 
-        return redirect()->route('users.show',compact('user'))->with('success','یوزر ادیت شد');
+        return redirect()->route('admin.users.show',compact('user'))->with('success','کاربر با موفقیت ویرایش شد');
     }
 
-    public function destroy(User $user){
+    public function destroy(User $user,Request $request){
         $this->authorize('delete_user',$user);
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User deleted successfully');
+        return redirect()->route('admin.users.index')->with('success', 'کاربر با موفقیت حذف شد');
     }
 
-    public function uploadAvatar(Request $request){
+    public function uploadAvatar(Request $request, ImageService $images){
         $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1280000',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048', // قبلاً svg مجاز و سقف ~۱٫۲ گیگابایت بود
         ]);
-        $path = $request->file('avatar')->store('users-avatar/uploads/'.now()->format('Y/m/d'),'public');
+        $path = $images->storeAvatar($request->file('avatar'), 'users-avatar/uploads'); // مربع ۲۵۶px، webp
 
         return response()->json([
             'success' => true,

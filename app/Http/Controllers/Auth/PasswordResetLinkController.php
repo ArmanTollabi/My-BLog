@@ -17,7 +17,7 @@ class PasswordResetLinkController extends Controller
         $request->validate(['email' => 'required|email']);
         $status = Password::sendResetLink($request->only('email')); //$request->only('email') is array and sendResetLink method wants an 'array' type of entry, can't accept string thats why we can not give it $request->email! cuz it's string!
         if($status === Password::RESET_LINK_SENT){
-           return back()->with('status',__($status));
+           return back()->with('status','لینک بازیابی رمز به ایمیل شما فرستاده شد');
         }
         return back()->withInput($request->only('email'))->withErrors(['email' => __($status)]);
 
