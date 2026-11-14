@@ -9,7 +9,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.5",
         "dedoc/scramble": "^0.13.47",
         "intervention/image-laravel": "^4.1",
         "laravel-lang/lang": "^15.37",
