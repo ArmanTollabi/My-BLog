@@ -43,7 +43,7 @@ Route::get('posts/search', [PostController::class, 'search'])->name('posts.searc
 
 Route::middleware('guest')->prefix('auth')->group(function () {
     Route::get('register', [RegisterController::class, 'ShowRegisterForm'])->name('register');
-    Route::post('register', [RegisterController::class, 'Register'])->middleware('throttle:3,30')->name('register');
+    Route::post('register', [RegisterController::class, 'Register'])->middleware('throttle:3,30');
 
     Route::get('login', [LoginController::class, 'ShowLoginForm'])->name('login');
     Route::post('login', [LoginController::class, 'Login'])->name('login');
