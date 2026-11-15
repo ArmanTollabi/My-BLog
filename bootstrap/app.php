@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
+        // پشت پروکسی Railway: هدرهای X-Forwarded-* (از جمله https) را قبول کن
+        $middleware->trustProxies(at: '*');
+
         $middleware->redirectUsersTo(function (Request $request) {
             $previous = url()->previous();
 
