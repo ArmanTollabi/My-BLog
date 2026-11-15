@@ -44,3 +44,5 @@
 @media (max-width: 379.98px) {
     .hdr-row .brand-name { display: none; }
 }
+
+header:has(.site-nav) { z-index: 100; }
