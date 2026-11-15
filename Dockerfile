@@ -20,6 +20,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# پورت را از متغیر PORT (که Railway می‌دهد) بخوان؛ فقط یک بار در زمان Build ویرایش می‌شود
+ENV PORT=8080
+RUN sed -ri 's/Listen 80$/Listen ${PORT}/' /etc/apache2/ports.conf \
+    && sed -ri 's/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/' /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
 COPY composer.json composer.lock ./
@@ -30,4 +34,4 @@ COPY --from=assets /app/public/build ./public/build
 RUN composer dump-autoload --optimize --no-dev \
     && chown -R www-data:www-data storage bootstrap/cache
 
-CMD ["sh", "-c", "sed -i \"s/80/${PORT:-8080}/g\" /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf && php artisan storage:link --force || true; php artisan config:cache; apache2-foreground"]
+CMD ["sh", "-c", "php artisan storage:link --force || true; php artisan config:cache; apache2-foreground"]
