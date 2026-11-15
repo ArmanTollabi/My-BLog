@@ -30,4 +30,4 @@ RUN composer dump-autoload --optimize --no-dev \
 ENV PHP_CLI_SERVER_WORKERS=4
 ENV PORT=8080
 
-CMD ["sh", "-c", "php artisan storage:link --force || true; php artisan config:cache; php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
+CMD ["sh", "-c", "php artisan migrate --force; echo '>>> MIGRATE DONE'; php artisan storage:link --force || true; php artisan config:cache; echo '>>> STARTING SERVER on port' ${PORT:-8080}; exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
