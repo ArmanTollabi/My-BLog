@@ -13,14 +13,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git unzip libzip-dev libicu-dev libpng-dev libjpeg-dev libfreetype6-dev libonig-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql bcmath intl zip gd mbstring opcache pcntl \
-    && a2dismod mpm_event mpm_worker || true \
-    && a2enmod mpm_prefork rewrite \
     && rm -rf /var/lib/apt/lists/*
+
+# فقط یک MPM (prefork) فعال بماند؛ فایل‌های بقیه مستقیم پاک می‌شوند
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf \
+    && ln -s ../mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
+    && ln -s ../mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
+    && a2enmod rewrite
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
 # پورت را از متغیر PORT (که Railway می‌دهد) بخوان؛ فقط یک بار در زمان Build ویرایش می‌شود
 ENV PORT=8080
 RUN sed -ri 's/Listen 80$/Listen ${PORT}/' /etc/apache2/ports.conf \
@@ -35,4 +40,5 @@ COPY --from=assets /app/public/build ./public/build
 RUN composer dump-autoload --optimize --no-dev \
     && chown -R www-data:www-data storage bootstrap/cache
 
-CMD ["sh", "-c", "a2dismod mpm_event mpm_worker >/dev/null 2>&1 || true; a2enmod mpm_prefork >/dev/null 2>&1 || true; php artisan storage:link --force || true; php artisan config:cache; apache2-foreground"]
+# خط اول فقط برای عیب‌یابی است: MPM های فعال را در لاگ نشان می‌دهد
+CMD ["sh", "-c", "ls /etc/apache2/mods-enabled | grep mpm; php artisan storage:link --force || true; php artisan config:cache; apache2-foreground"]
