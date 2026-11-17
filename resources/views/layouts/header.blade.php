@@ -8,9 +8,7 @@
     @stack('head')
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
-    @if(Route::currentRouteName() === 'posts.index')
-        @vite('resources/js/custom.js')
-    @endif
+
 </head>
 <section class="glass border-b border-white/10">
     <div class="hdr-wrap max-w-7xl mx-auto px-6 pt-5 pb-5">
