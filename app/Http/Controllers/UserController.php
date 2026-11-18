@@ -61,13 +61,24 @@ class UserController extends Controller
 
     public function store(Request $request){
         $this->authorize('access_user', User::class); // قبلاً چک نمی‌شد
-        $validated = $request->validate([
+        // فقط ادمین اصلی (id=1) می‌تواند نقش تعیین کند؛ بقیه‌ی ادمین‌ها فقط «کاربر عادی» می‌سازند
+        $canSetRole = $request->user()->can('edit_admin', User::class);
+
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
-            'role' => ['required', Rule::enum(UserRole::class)],
             'avatar_path' => ['nullable','string','max:255','regex:#^users-avatar/uploads/[\w/\-]+\.webp$#']
-        ]);
+        ];
+        if ($canSetRole) {
+            $rules['role'] = ['required', Rule::enum(UserRole::class)];
+        }
+
+        $validated = $request->validate($rules);
+
+        if (! $canSetRole) {
+            $validated['role'] = UserRole::Subscriber->value; // هر چیزی که در درخواست باشد نادیده گرفته می‌شود
+        }
 
         $validated['avatar'] = $validated['avatar_path'] ?? null;
 
@@ -100,8 +111,8 @@ class UserController extends Controller
 
         unset($validatedData['avatar_path']);
 
-        // تغییر نقش: فقط ادمین، و نه روی حساب خودش (جلوگیری از قفل شدن پنل و ارتقای نقش توسط کاربر عادی)
-        if ($request->user()->isAdmin() && ! $user->is($request->user())) {
+        // تغییر نقش: فقط ادمین اصلی (id=1) و نه روی حساب خودش. برای بقیه فیلد role کاملاً نادیده گرفته می‌شود.
+        if ($request->user()->can('edit_admin', User::class) && ! $user->is($request->user())) {
             $validatedData['role'] = $request->validate([
                 'role' => ['required', Rule::enum(UserRole::class)],
             ])['role'];

@@ -41,27 +41,33 @@
                        class="glass-input text-left @error('email') !border-rose-400/70 @enderror">
             </div>
 
-            {{-- User role: فقط ادمین می‌بیند؛ روی حساب خودِ ادمین غیرفعال است --}}
+            {{-- User role: فقط ادمین‌ها این بخش را می‌بینند؛ فقط ادمین اصلی (id=1) می‌تواند تغییرش بدهد --}}
             @if(auth()->user()->isAdmin())
                 @php($isSelf = auth()->id() === $user->id)
-            @can('edit_admin',App\Models\User::class)
                 <div class="mb-6">
                     <label for="role" class="block text-sm font-semibold text-white mb-2">
                         نقش کاربر
                     </label>
 
-                        <select id="role" name="role" @disabled($isSelf)
-                        class="glass-input @error('role') !border-rose-400/70 @enderror" required>
-                            <option>نقش کاربر را انتخاب کنید</option>
+                    @can('edit_admin', App\Models\User::class)
+                        <select id="role" name="role" @disabled($isSelf) required
+                                class="glass-input @error('role') !border-rose-400/70 @enderror">
+                            <option value="">نقش کاربر را انتخاب کنید</option>
                             @foreach(\App\Enums\UserRole::cases() as $role)
-                                <option value="{{ $role->value }}" @selected(old('role', $user->role) === $role->value)> {{ $role->label() }}</option>
+                                <option value="{{ $role->value }}" @selected(old('role', $user->role) === $role->value)>{{ $role->label() }}</option>
                             @endforeach
                         </select>
-            @endcan
 
-                    @if($isSelf)
-                        <p class="text-white/50 text-xs mt-1">نقش حساب خودت را نمی‌توانی تغییر بدهی.</p>
-                    @endif
+                        @if($isSelf)
+                            <p class="text-white/50 text-xs mt-1">نقش حساب خودت را نمی‌توانی تغییر بدهی.</p>
+                        @endif
+                    @else
+                        {{-- ادمین‌های دیگر: فقط نمایش، بدون امکان تغییر --}}
+                        <p class="glass-input opacity-70 cursor-not-allowed">
+                            {{ \App\Enums\UserRole::tryFrom((string) $user->role)?->label() ?? '—' }}
+                        </p>
+                    @endcan
+
                     @error('role')
                     <p class="text-rose-300 text-xs mt-1">{{ $message }}</p>
                     @enderror

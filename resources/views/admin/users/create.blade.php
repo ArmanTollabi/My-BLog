@@ -41,23 +41,29 @@
             </div>
 
             <!-- User role -->
-        @can('edit_admin',App\Models\User::class)
-                <div class="mb-6">
+            <div class="mb-6">
                 <label for="role" class="block text-sm font-semibold text-white mb-2">
                     نقش کاربر:
                 </label>
-                <select id="role" name="role" required
-                        class="glass-input @error('role') !border-rose-400/70 @enderror">
-                    <option>نقش کاربر را انتخاب کنید</option>
-                    @foreach(\App\Enums\UserRole::cases() as $role)
-                        <option value="{{ $role->value }}" @selected(old('role', \App\Enums\UserRole::Subscriber->value) === $role->value)>{{ $role->label() }}</option>
-                    @endforeach
-                </select>
+
+                @can('edit_admin', App\Models\User::class)
+                    {{-- فقط ادمین اصلی همه‌ی نقش‌ها را می‌بیند --}}
+                    <select id="role" name="role" required
+                            class="glass-input @error('role') !border-rose-400/70 @enderror">
+                        <option value="">نقش کاربر را انتخاب کنید</option>
+                        @foreach(\App\Enums\UserRole::cases() as $role)
+                            <option value="{{ $role->value }}" @selected(old('role', \App\Enums\UserRole::Subscriber->value) === $role->value)>{{ $role->label() }}</option>
+                        @endforeach
+                    </select>
+                @else
+                    {{-- بقیه‌ی ادمین‌ها فقط «کاربر عادی» می‌سازند (سرور هم این را اجبار می‌کند) --}}
+                    <p class="glass-input opacity-70 cursor-not-allowed">{{ \App\Enums\UserRole::Subscriber->label() }}</p>
+                @endcan
+
                 @error('role')
                 <p class="text-rose-300 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
-        @endcan
 
             <!-- Avatar -->
             <div class="mb-6">

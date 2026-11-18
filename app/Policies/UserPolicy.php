@@ -3,88 +3,72 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
+    private const SUPER_ADMIN_ID = 1;
+
+    /** ادمین اصلی: تنها کسی که نقش‌ها را تعیین/تغییر می‌دهد و ادمین‌ها را مدیریت می‌کند */
+    private function isSuper(User $user): bool
+    {
+        return $user->id === self::SUPER_ADMIN_ID;
+    }
 
     public function isAdmin(User $user): bool
     {
         return $user->role === 'admin';
     }
-    public function edit_admin(User $user)
-    {
-        return $user->id === 1;
-    }
-    public function update_user(User $user,User $targetUser):bool{
 
-        return $user->role === 'admin' || $user->id === $targetUser->id ;
+    /** دیدن/تغییر نقش‌ها و ساخت ادمین: فقط ادمین اصلی */
+    public function edit_admin(User $user): bool
+    {
+        return $this->isSuper($user);
     }
-    public function access_user(User $user):bool
+
+    /**
+     * ویرایش کاربر:
+     *  - ادمین اصلی: همه
+     *  - هر کاربر: حساب خودش
+     *  - ادمین‌های دیگر: فقط کاربران غیرادمین
+     */
+    public function update_user(User $user, User $targetUser): bool
+    {
+        if ($this->isSuper($user) || $user->is($targetUser)) {
+            return true;
+        }
+
+        return $user->role === 'admin' && $targetUser->role !== 'admin';
+    }
+
+    public function access_user(User $user): bool
     {
         return $user->role === 'admin';
     }
 
-    public function delete_user(User $user,User $targetUser):bool{
-
-        // ادمین: همه به‌جز خودش | کاربر عادی: فقط خودش
-        return $user->isAdmin()
-            ? ! $user->is($targetUser)
-            : $user->is($targetUser);
-    }
     /**
-     * Determine whether the user can view any models.
+     * حذف کاربر:
+     *  - هیچ‌کس نمی‌تواند خودش را «به‌عنوان ادمین» حذف کند؛ کاربر عادی فقط خودش را می‌تواند
+     *  - ادمین اصلی: همه‌ی دیگران
+     *  - ادمین‌های دیگر: فقط کاربران غیرادمین
      */
-    public function viewAny(User $user): bool
+    public function delete_user(User $user, User $targetUser): bool
     {
-        return false;
-    }
+        if ($user->is($targetUser)) {
+            return ! $this->isAdmin($user);
+        }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, User $model): bool
-    {
-        return false;
+        if ($this->isSuper($user)) {
+            return true;
+        }
+
+        return $user->role === 'admin' && $targetUser->role !== 'admin';
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, User $model): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, User $model): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, User $model): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, User $model): bool
-    {
-        return false;
-    }
+    public function viewAny(User $user): bool { return false; }
+    public function view(User $user, User $model): bool { return false; }
+    public function create(User $user): bool { return false; }
+    public function update(User $user, User $model): bool { return false; }
+    public function delete(User $user, User $model): bool { return false; }
+    public function restore(User $user, User $model): bool { return false; }
+    public function forceDelete(User $user, User $model): bool { return false; }
 }
