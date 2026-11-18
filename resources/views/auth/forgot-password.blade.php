@@ -14,12 +14,12 @@
     </div>
 
 
-    <div class="min-h-[80vh] flex items-center justify-center px-4 py-8">
+    <div class="min-h-[70svh] flex items-center justify-center px-4 py-6 sm:py-8">
 
         <div class="w-full max-w-md">
 
             {{-- آیکن و عنوان --}}
-            <div class="text-center mb-8">
+            <div class="text-center mb-6 sm:mb-8">
 
                 <div class="mx-auto mb-5 grid place-items-center w-16 h-16 rounded-3xl text-white
                             border border-white/25 shadow-lg shadow-violet-500/30
@@ -29,7 +29,7 @@
                     </svg>
                 </div>
 
-                <h1 class="text-3xl font-extrabold text-white">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white">
                     رمز عبور خود را فراموش کرده اید؟
                 </h1>
 
@@ -40,7 +40,7 @@
             </div>
 
             <form id="forgot-form" data-submit-lock data-loading-text="در حال ارسال…" action="{{ route('password.email') }}" method="POST"
-                  class="glass rounded-3xl p-8 sm:p-10 space-y-6">
+                  class="glass rounded-3xl p-5 sm:p-10 space-y-5 sm:space-y-6">
 
                 @csrf
 
@@ -69,7 +69,7 @@
                             </svg>
                         </span>
 
-                        <input type="email" id="email" name="email" value="{{ old('email') }}"
+                        <input type="email" inputmode="email" autocapitalize="none" spellcheck="false" id="email" name="email" value="{{ old('email') }}"
                                dir="ltr" required autofocus autocomplete="email"
                                placeholder="example@email.com"
                                @error('email') aria-invalid="true" aria-describedby="email-error" @enderror

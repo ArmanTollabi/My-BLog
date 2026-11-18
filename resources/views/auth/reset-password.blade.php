@@ -14,12 +14,12 @@
     </div>
 
 
-    <div class="min-h-[80vh] flex items-center justify-center px-4 py-8">
+    <div class="min-h-[70svh] flex items-center justify-center px-4 py-6 sm:py-8">
 
         <div class="w-full max-w-md">
 
             {{-- آیکن و عنوان --}}
-            <div class="text-center mb-8">
+            <div class="text-center mb-6 sm:mb-8">
 
                 <div class="mx-auto mb-5 grid place-items-center w-16 h-16 rounded-3xl text-white
                             border border-white/25 shadow-lg shadow-violet-500/30
@@ -29,7 +29,7 @@
                     </svg>
                 </div>
 
-                <h1 class="text-3xl font-extrabold text-white">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white">
                     بازیابی رمز عبور
                 </h1>
 
@@ -40,7 +40,7 @@
             </div>
 
             <form id="reset-form" data-submit-lock data-loading-text="در حال ذخیره…" action="{{ route('password.update') }}" method="POST"
-                  class="glass rounded-3xl p-8 sm:p-10 space-y-6" novalidate>
+                  class="glass rounded-3xl p-5 sm:p-10 space-y-5 sm:space-y-6" novalidate>
 
                 @csrf
 
@@ -59,7 +59,7 @@
                             </svg>
                         </span>
 
-                        <input type="email" id="email" name="email"
+                        <input type="email" inputmode="email" autocapitalize="none" spellcheck="false" id="email" name="email"
                                value="{{ old('email', request('email')) }}"
                                dir="ltr" required autocomplete="email"
                                @if(old('email', request('email'))) readonly @endif
@@ -101,7 +101,7 @@
                                       @error('password') !border-rose-400/70 @enderror">
 
                         <button type="button" data-toggle-password="password"
-                                class="absolute inset-y-0 right-3 my-auto h-9 w-9 grid place-items-center rounded-xl
+                                class="absolute inset-y-0 right-3 my-auto h-10 w-10 grid place-items-center rounded-xl
                                        text-white/55 hover:text-white hover:bg-white/10 transition cursor-pointer"
                                 aria-label="نمایش رمز عبور" aria-pressed="false">
                             <svg data-eye-open class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
@@ -158,7 +158,7 @@
                                class="glass-input pl-12 pr-12 text-left">
 
                         <button type="button" data-toggle-password="password_confirmation"
-                                class="absolute inset-y-0 right-3 my-auto h-9 w-9 grid place-items-center rounded-xl
+                                class="absolute inset-y-0 right-3 my-auto h-10 w-10 grid place-items-center rounded-xl
                                        text-white/55 hover:text-white hover:bg-white/10 transition cursor-pointer"
                                 aria-label="نمایش تکرار رمز عبور" aria-pressed="false">
                             <svg data-eye-open class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">

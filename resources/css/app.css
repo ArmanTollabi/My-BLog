@@ -2157,3 +2157,9 @@ html::after  { translate: calc(var(--px) * -2.6vw) calc(var(--py) * -2.6vh); }
     .site-nav { width: 100%; }
     .nav-link { padding: 0.5rem 0.85rem; }
 }
+/* موبایل: iOS روی input با فونت کوچک‌تر از ۱۶px صفحه را زوم می‌کند */
+@media (max-width: 640px) {
+    .glass-input {
+        font-size: 16px;
+    }
+}

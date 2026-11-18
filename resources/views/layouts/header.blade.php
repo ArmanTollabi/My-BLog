@@ -267,13 +267,22 @@
 
                     {{-- مهمان --}}
                     @guest
-                        <a href="{{ route('login') }}" class="btn-glass">
-                            ورود
-                        </a>
+                        {{-- موبایل: فقط یک دکمه (ثبت‌نام داخل صفحه‌ی ورود هست). دسکتاپ: دو دکمه --}}
+                        <div class="sm:hidden">
+                            <a href="{{ route('login') }}" class="btn-create btn-sm">
+                                ورود / ثبت‌نام
+                            </a>
+                        </div>
 
-                        <a href="{{ route('register') }}" class="btn-create">
-                            ثبت‌نام
-                        </a>
+                        <div class="hidden sm:flex items-center gap-3">
+                            <a href="{{ route('login') }}" class="btn-glass">
+                                ورود
+                            </a>
+
+                            <a href="{{ route('register') }}" class="btn-create">
+                                ثبت‌نام
+                            </a>
+                        </div>
                     @endguest
 
                 </div>
