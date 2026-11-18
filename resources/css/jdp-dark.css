@@ -22,7 +22,6 @@ jdp-container .jdp-year, jdp-container .jdp-month, jdp-container .jdp-time { min
 
 jdp-container .jdp-year select, jdp-container .jdp-month select, jdp-container .jdp-time select,
 jdp-container .jdp-year input,  jdp-container .jdp-month input,  jdp-container .jdp-time input {
-    -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important;
     box-sizing: border-box !important;
     width: 100% !important; min-width: 0 !important; height: auto !important; min-height: 0 !important;
     margin: 0 !important; padding: .3rem .4rem !important;
@@ -32,13 +31,13 @@ jdp-container .jdp-year input,  jdp-container .jdp-month input,  jdp-container .
     color: var(--jdp-color-5) !important; color-scheme: dark;
     font: inherit !important; font-weight: 600 !important; text-align: center !important; line-height: 1.5 !important;
 }
-/* فلش سفارشی: فقط یک‌بار، سمت چپ (تقویم RTL است) */
+/* select ها: لیست و فلش را خود مرورگر می‌کشد (appearance:none لیست را نامرئی می‌کرد) */
 jdp-container .jdp-year select, jdp-container .jdp-month select, jdp-container .jdp-time select {
-    padding-left: 1.4rem !important; padding-right: .4rem !important;   /* فلش سمت چپ است */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4b5fd' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: left .4rem center !important;
-    background-size: .85rem !important;
+    appearance: auto !important; -webkit-appearance: menulist !important;
+    padding: .3rem .4rem !important; cursor: pointer;
+}
+jdp-container .jdp-year input, jdp-container .jdp-month input, jdp-container .jdp-time input {
+    appearance: none !important; -webkit-appearance: none !important; -moz-appearance: textfield !important;
 }
 jdp-container .jdp-year select:hover, jdp-container .jdp-month select:hover, jdp-container .jdp-time select:hover { background-color: #38276f !important; filter: none !important; }
 jdp-container .jdp-year select:focus-visible, jdp-container .jdp-month select:focus-visible, jdp-container .jdp-time select:focus-visible { outline: 2px solid #a78bfa !important; outline-offset: 1px; }

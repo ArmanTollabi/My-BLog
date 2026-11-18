@@ -14,17 +14,13 @@
 .tag-option:hover { background: rgb(255 255 255 / .1); }
 
 /* select: لیست تیره + فلش سفارشی (فلش سمت چپ چون صفحه RTL است) */
+/* select: لیست و فلش را خود مرورگر می‌کشد؛ appearance:none لیست را نامرئی می‌کرد */
 select.field,
 select.field:focus {
     color-scheme: dark;
     background-color: #1a0f3d;
-    appearance: none;
-    -webkit-appearance: none;
+    appearance: auto;
     cursor: pointer;
-    padding-inline-start: 2.5rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff99' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: left 1rem center;
-    background-size: 1rem 1rem;
+    padding-inline: 0.8rem;
 }
 select.field option { background: #1a0f3d; color: #fff; }
