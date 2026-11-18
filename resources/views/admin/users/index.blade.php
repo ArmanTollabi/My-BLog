@@ -67,9 +67,26 @@
                         </span>
 
                         <div class="min-w-0">
-                            <h2 class="text-lg font-bold text-white truncate">
-                                {{ $user->name }}
-                            </h2>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h2 class="text-lg font-bold text-white truncate">
+                                    {{ $user->name }}
+                                </h2>
+
+                                {{-- لیبل نقش: ادمین‌ها «ادمین» و ادمین اصلی (id=1) «سازنده» هم می‌گیرد --}}
+                                @if($user->isAdmin())
+                                    <span class="inline-block rounded-full border border-violet-300/40 bg-violet-500/25
+                                                 px-2.5 py-0.5 text-xs font-semibold text-violet-100">
+                                        ادمین
+                                    </span>
+                                @endif
+
+                                @if($user->id === 1)
+                                    <span class="inline-block rounded-full border border-amber-300/40 bg-amber-400/20
+                                                 px-2.5 py-0.5 text-xs font-semibold text-amber-100">
+                                        سازنده
+                                    </span>
+                                @endif
+                            </div>
 
                             <p dir="ltr" class="text-sm text-white/55 mt-0.5 truncate text-left">
                                 {{ $user->email }}
