@@ -41,7 +41,8 @@
             </div>
 
             <!-- User role -->
-            <div class="mb-6">
+        @can('edit_admin',App\Models\User::class)
+                <div class="mb-6">
                 <label for="role" class="block text-sm font-semibold text-white mb-2">
                     نقش کاربر:
                 </label>
@@ -56,6 +57,7 @@
                 <p class="text-rose-300 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
+        @endcan
 
             <!-- Avatar -->
             <div class="mb-6">

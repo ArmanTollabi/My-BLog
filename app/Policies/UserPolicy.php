@@ -12,6 +12,10 @@ class UserPolicy
     {
         return $user->role === 'admin';
     }
+    public function edit_admin(User $user)
+    {
+        return $user->id === 1;
+    }
     public function update_user(User $user,User $targetUser):bool{
 
         return $user->role === 'admin' || $user->id === $targetUser->id ;

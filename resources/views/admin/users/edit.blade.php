@@ -48,13 +48,16 @@
                     <label for="role" class="block text-sm font-semibold text-white mb-2">
                         نقش کاربر
                     </label>
-                    <select id="role" name="role" @disabled($isSelf)
-                    class="glass-input @error('role') !border-rose-400/70 @enderror" required>
-                        <option>نقش کاربر را انتخاب کنید</option>
-                        @foreach(\App\Enums\UserRole::cases() as $role)
-                            <option value="{{ $role->value }}" @selected(old('role', $user->role) === $role->value)> {{ $role->label() }}</option>
-                        @endforeach
-                    </select>
+                    @can('edit_admin',App\Models\User::class)
+                        <select id="role" name="role" @disabled($isSelf)
+                        class="glass-input @error('role') !border-rose-400/70 @enderror" required>
+                            <option>نقش کاربر را انتخاب کنید</option>
+                            @foreach(\App\Enums\UserRole::cases() as $role)
+                                <option value="{{ $role->value }}" @selected(old('role', $user->role) === $role->value)> {{ $role->label() }}</option>
+                            @endforeach
+                        </select>
+                    @endcan
+
                     @if($isSelf)
                         <p class="text-white/50 text-xs mt-1">نقش حساب خودت را نمی‌توانی تغییر بدهی.</p>
                     @endif
