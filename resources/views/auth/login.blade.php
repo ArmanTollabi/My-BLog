@@ -2,7 +2,17 @@
 
 @section('title', 'ورود')
 
+@section('hide_header', '1')
 @section('content')
+
+    {{-- صفحه‌های احراز هویت هدر سایت را ندارند؛ فقط یک راه خروج به صفحه‌ی اصلی --}}
+    <div class="px-4 pt-6 text-center">
+        <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition">
+            <span aria-hidden="true">→</span>
+            بازگشت به MyBlog
+        </a>
+    </div>
+
 
     <div class="min-h-[70vh] flex items-center justify-center py-8">
         <div class="w-full max-w-md">

@@ -2,7 +2,17 @@
 
 @section('title', 'فراموشی رمز عبور')
 
+@section('hide_header', '1')
 @section('content')
+
+    {{-- صفحه‌های احراز هویت هدر سایت را ندارند؛ فقط یک راه خروج به صفحه‌ی اصلی --}}
+    <div class="px-4 pt-6 text-center">
+        <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition">
+            <span aria-hidden="true">→</span>
+            بازگشت به MyBlog
+        </a>
+    </div>
+
 
     <div class="min-h-[80vh] flex items-center justify-center px-4 py-8">
 
@@ -91,7 +101,7 @@
                 <div class="pt-5 border-t border-white/10 text-center">
                     <a href="{{ route('login') }}"
                        class="text-sm font-medium text-violet-300 hover:text-violet-200 transition">
-                         برگشت به صفحه ورود←
+                        → برگشت به صفحه ورود
                     </a>
                 </div>
 

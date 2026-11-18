@@ -2,7 +2,17 @@
 
 @section('title', 'بازیابی رمز عبور')
 
+@section('hide_header', '1')
 @section('content')
+
+    {{-- صفحه‌های احراز هویت هدر سایت را ندارند؛ فقط یک راه خروج به صفحه‌ی اصلی --}}
+    <div class="px-4 pt-6 text-center">
+        <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition">
+            <span aria-hidden="true">→</span>
+            بازگشت به MyBlog
+        </a>
+    </div>
+
 
     <div class="min-h-[80vh] flex items-center justify-center px-4 py-8">
 
@@ -93,7 +103,7 @@
                         <button type="button" data-toggle-password="password"
                                 class="absolute inset-y-0 right-3 my-auto h-9 w-9 grid place-items-center rounded-xl
                                        text-white/55 hover:text-white hover:bg-white/10 transition cursor-pointer"
-                                aria-label="Show password" aria-pressed="false">
+                                aria-label="نمایش رمز عبور" aria-pressed="false">
                             <svg data-eye-open class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.04 12.32a1.01 1.01 0 010-.64C3.42 7.51 7.36 4.5 12 4.5c4.64 0 8.58 3.01 9.96 7.18.07.21.07.43 0 .64C20.58 16.49 16.64 19.5 12 19.5c-4.64 0-8.58-3.01-9.96-7.18z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -150,7 +160,7 @@
                         <button type="button" data-toggle-password="password_confirmation"
                                 class="absolute inset-y-0 right-3 my-auto h-9 w-9 grid place-items-center rounded-xl
                                        text-white/55 hover:text-white hover:bg-white/10 transition cursor-pointer"
-                                aria-label="Show confirmation password" aria-pressed="false">
+                                aria-label="نمایش تکرار رمز عبور" aria-pressed="false">
                             <svg data-eye-open class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.04 12.32a1.01 1.01 0 010-.64C3.42 7.51 7.36 4.5 12 4.5c4.64 0 8.58 3.01 9.96 7.18.07.21.07.43 0 .64C20.58 16.49 16.64 19.5 12 19.5c-4.64 0-8.58-3.01-9.96-7.18z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -178,7 +188,7 @@
                 <div class="pt-5 border-t border-white/10 text-center">
                     <a href="{{ route('login') }}"
                        class="text-sm font-medium text-violet-300 hover:text-violet-200 transition">
-                        ← برگشت به صفحه ی ورود
+                        → برگشت به صفحه‌ی ورود
                     </a>
                 </div>
 
