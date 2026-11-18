@@ -47,6 +47,7 @@
                 </label>
                 <select id="role" name="role" required
                         class="glass-input @error('role') !border-rose-400/70 @enderror">
+                    <option>نقش کاربر را انتخاب کنید</option>
                     @foreach(\App\Enums\UserRole::cases() as $role)
                         <option value="{{ $role->value }}" @selected(old('role', \App\Enums\UserRole::Subscriber->value) === $role->value)>{{ $role->label() }}</option>
                     @endforeach
