@@ -1,8 +1,6 @@
 <!--header-->
-@unless(View::hasSection('hide_header'))
-    {{-- همان کد هدر فعلی --}}
-    @include('layouts.header')
-@endunless
+@include('layouts.header')
+
 <!-- Sidebar -->
 @auth
     @can('view_cat',\App\Models\Category::class)
