@@ -16,10 +16,7 @@ class SeoController extends Controller
             'User-agent: *',
             'Disallow: /admin',
             'Disallow: /dashboard',
-            'Disallow: /login',
-            'Disallow: /register',
-            'Disallow: /forgot-password',
-            'Disallow: /reset-password',
+            'Disallow: /auth/',
             'Disallow: /posts/search',
             '',
             'Sitemap: ' . url('/sitemap.xml'),
@@ -45,6 +42,11 @@ class SeoController extends Controller
             }
         });
 
-        return response(view('seo.sitemap', ['urls' => $urls])->render(), 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+        // خط <?xml باید از PHP بیاید، نه از blade: روی سرورهایی که short_open_tag روشن است،
+        // نوشتن آن داخل فایل blade باعث ParseError می‌شود.
+        $xml = '<' . '?xml version="1.0" encoding="UTF-8"?>' . "\n"
+            . view('seo.sitemap', ['urls' => $urls])->render();
+
+        return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
     }
 }
